@@ -124,38 +124,64 @@
   };
 
   // ==========================================
-  // APPLICATION STATE
+  // APPLICATION STATE DEFAULTS
   // ==========================================
+  const DEFAULT_GUEST_USER = {
+    name: "Guest Driver",
+    email: "guest@torqueandco.com",
+    phone: "(555) 010-2938"
+  };
+
+  const DEFAULT_VEHICLES = [
+    {
+      id: "veh-1",
+      title: "2021 Honda Accord EX-L",
+      vin: "1HGCM82633A004352",
+      plate: "7XYZ890",
+      miles: "62,140",
+      health: "Certified Good",
+      oilLife: 82,
+      brakesMm: "4.2mm (35%)"
+    },
+    {
+      id: "veh-2",
+      title: "2023 Tesla Model Y Long Range",
+      vin: "5YJYGDEE8PF829104",
+      plate: "9ELC321",
+      miles: "18,400",
+      health: "Optimal",
+      oilLife: 100,
+      brakesMm: "9.0mm (85%)"
+    }
+  ];
+
+  const DEFAULT_HISTORY = [
+    {
+      date: "June 14, 2026",
+      services: "Synthetic Oil Change & Tire Rotation",
+      miles: "54,200",
+      total: "$134.00",
+      invoiceId: "INV-2026-4412"
+    },
+    {
+      date: "January 20, 2026",
+      services: "Cabin Micro-Filter & Brake Fluid Flush",
+      miles: "47,800",
+      total: "$182.50",
+      invoiceId: "INV-2026-1092"
+    }
+  ];
+
+  const DEFAULT_MESSAGES = [
+    { sender: "tech", text: "Hi Jordan, Marcus here from Bay 3. We've got your vehicle up on the lift and started the oil service.", time: (window.GeoTime ? window.GeoTime.getRelativeTimeString(-35) : "1:32 PM") },
+    { sender: "tech", text: "During the safety inspection, I spotted surface cracking on the serpentine belt. I've sent photo proof to your estimate tab for approval.", time: (window.GeoTime ? window.GeoTime.getRelativeTimeString(-10) : "2:16 PM") }
+  ];
+
   const state = {
     currentScreen: "home",
     isAuthenticated: false,
-    user: {
-      name: "Guest Driver",
-      email: "guest@torqueandco.com",
-      phone: "(555) 010-2938"
-    },
-    vehicles: [
-      {
-        id: "veh-1",
-        title: "2021 Honda Accord EX-L",
-        vin: "1HGCM82633A004352",
-        plate: "7XYZ890",
-        miles: "62,140",
-        health: "Certified Good",
-        oilLife: 82,
-        brakesMm: "4.2mm (35%)"
-      },
-      {
-        id: "veh-2",
-        title: "2023 Tesla Model Y Long Range",
-        vin: "5YJYGDEE8PF829104",
-        plate: "9ELC321",
-        miles: "18,400",
-        health: "Optimal",
-        oilLife: 100,
-        brakesMm: "9.0mm (85%)"
-      }
-    ],
+    user: JSON.parse(JSON.stringify(DEFAULT_GUEST_USER)),
+    vehicles: JSON.parse(JSON.stringify(DEFAULT_VEHICLES)),
     activeVehicleIndex: 0,
     booking: {
       selectedServices: ["oil-syn"],
@@ -174,26 +200,8 @@
       method: "applepay",
       isPaid: false
     },
-    messages: [
-      { sender: "tech", text: "Hi Jordan, Marcus here from Bay 3. We've got your vehicle up on the lift and started the oil service.", time: (window.GeoTime ? window.GeoTime.getRelativeTimeString(-35) : "1:32 PM") },
-      { sender: "tech", text: "During the safety inspection, I spotted surface cracking on the serpentine belt. I've sent photo proof to your estimate tab for approval.", time: (window.GeoTime ? window.GeoTime.getRelativeTimeString(-10) : "2:16 PM") }
-    ],
-    history: [
-      {
-        date: "June 14, 2026",
-        services: "Synthetic Oil Change & Tire Rotation",
-        miles: "54,200",
-        total: "$134.00",
-        invoiceId: "INV-2026-4412"
-      },
-      {
-        date: "January 20, 2026",
-        services: "Cabin Micro-Filter & Brake Fluid Flush",
-        miles: "47,800",
-        total: "$182.50",
-        invoiceId: "INV-2026-1092"
-      }
-    ]
+    messages: JSON.parse(JSON.stringify(DEFAULT_MESSAGES)),
+    history: JSON.parse(JSON.stringify(DEFAULT_HISTORY))
   };
 
   // ==========================================
@@ -1210,6 +1218,7 @@
         if (navAvatar) {
           navAvatar.style.display = "flex";
           navAvatar.textContent = initials;
+          navAvatar.title = `Signed in as ${state.user.name} — Account Passport`;
         }
         if (accountAuthBadge) {
           accountAuthBadge.className = "auth-badge cloud";
@@ -1219,7 +1228,11 @@
         if (signinAccountBtn) signinAccountBtn.style.display = "none";
       } else {
         if (navAuthBtn) navAuthBtn.style.display = "inline-flex";
-        if (navAvatar) navAvatar.style.display = "none";
+        if (navAvatar) {
+          navAvatar.style.display = "flex";
+          navAvatar.textContent = "GD";
+          navAvatar.title = "Guest Driver — View Vehicle Passport & Records";
+        }
         if (accountAuthBadge) {
           accountAuthBadge.className = "auth-badge guest";
           accountAuthBadge.textContent = "Guest / Demo Mode";
@@ -1228,8 +1241,8 @@
         if (signinAccountBtn) signinAccountBtn.style.display = "inline-flex";
       }
 
-      if (accountAvatar) accountAvatar.textContent = initials;
-      if (accountUserName) accountUserName.textContent = state.user.name || "Guest Account";
+      if (accountAvatar) accountAvatar.textContent = state.isAuthenticated ? initials : "GD";
+      if (accountUserName) accountUserName.textContent = state.isAuthenticated ? (state.user.name || "Customer Account") : "Guest Driver";
       if (accountUserContact) {
         accountUserContact.innerHTML = `${state.user.email || 'guest@torqueandco.com'} &bull; ${state.user.phone || '(555) 010-2938'}`;
       }
@@ -1446,17 +1459,35 @@
       });
     }
 
-    // Sign Out Submission
-    if (signoutBtn) {
-      signoutBtn.addEventListener("click", async () => {
+    // Sign Out Handler & Cleanse
+    async function handleSignOut() {
+      try {
         if (typeof api !== "undefined") {
           await api.post("/auth/logout");
         }
-        state.isAuthenticated = false;
-        showToast("Signed out successfully.", "info");
-        updateAuthUI();
-        renderAccount();
-      });
+      } catch (err) {
+        console.warn("Logout error notice:", err);
+      }
+      state.isAuthenticated = false;
+      state.user = JSON.parse(JSON.stringify(DEFAULT_GUEST_USER));
+      state.vehicles = JSON.parse(JSON.stringify(DEFAULT_VEHICLES));
+      state.activeVehicleIndex = 0;
+      state.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+      state.messages = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
+      state.progress.stepIndex = 2;
+      state.booking.selectedServices = ["oil-syn"];
+
+      updateAuthUI();
+      renderHome();
+      renderAccount();
+      renderMessages();
+      renderProgress();
+      showToast("Signed out successfully. Switched to Guest Mode.", "info");
+      navigateTo("home");
+    }
+
+    if (signoutBtn) {
+      signoutBtn.addEventListener("click", handleSignOut);
     }
 
     // Initial Auth Check

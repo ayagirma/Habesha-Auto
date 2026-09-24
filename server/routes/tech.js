@@ -78,9 +78,9 @@ let baysState = [
     techName: "Marcus Vance",
     status: "active",
     customer: {
-      name: "Jordan Alvarez",
+      name: "Customer Account",
       phone: "(555) 010-2938",
-      email: "jordan.alvarez@email.com"
+      email: "ayagirma@gmail.com"
     },
     vehicle: {
       title: "2021 Honda Accord EX-L",

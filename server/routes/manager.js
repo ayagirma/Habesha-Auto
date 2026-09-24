@@ -87,7 +87,7 @@ let managerData = {
       id: "fnd-rev-1",
       bayId: "bay-3",
       techName: "Marcus Vance",
-      customerName: "Jordan Alvarez",
+      customerName: "Customer Account",
       vehicleTitle: "2021 Honda Accord EX-L",
       title: "Serpentine Drive Belt Micro-Cracking",
       notes: "Severe rib cracking identified on 30-pt safety scan. Deflection measured 80%.",

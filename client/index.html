@@ -77,9 +77,9 @@
         <span class="pulse-dot"></span>
         <span id="nav-bay-status-text">Bay 3 Active</span>
       </div>
-      <button class="btn btn-outline btn-sm" id="nav-auth-btn" style="display:none;">Sign In</button>
-      <button class="user-avatar-btn" data-nav="account" id="nav-user-avatar" title="Account &amp; Maintenance Passport">
-        JA
+      <button class="btn btn-outline btn-sm" id="nav-auth-btn">Sign In</button>
+      <button class="user-avatar-btn" data-nav="account" id="nav-user-avatar" title="Guest Driver — View Vehicle Passport &amp; History">
+        GD
       </button>
     </div>
   </header>
@@ -846,19 +846,19 @@
             <div style="display:flex; align-items:center; gap:16px; justify-content:space-between; flex-wrap:wrap;">
               <div style="display:flex; align-items:center; gap:16px;">
                 <div id="account-avatar" style="width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#801A00); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; color:#fff;">
-                  JA
+                  GD
                 </div>
                 <div>
                   <div style="display:flex; align-items:center; gap:10px;">
                     <h3 style="font-size:18px;" id="account-user-name">Guest Driver</h3>
-                    <span class="auth-badge cloud" id="account-auth-badge">Synced</span>
+                    <span class="auth-badge guest" id="account-auth-badge">Guest / Demo Mode</span>
                   </div>
                   <div style="font-size:13px; color:var(--text-secondary);" id="account-user-contact">guest@torqueandco.com &bull; (555) 010-2938</div>
                 </div>
               </div>
               <div style="display:flex; gap:10px;" id="account-auth-actions">
-                <button class="btn btn-outline btn-sm" id="signout-btn">Sign Out</button>
-                <button class="btn btn-primary btn-sm" id="signin-account-btn" style="display:none;">Sign In / Register</button>
+                <button class="btn btn-outline btn-sm" id="signout-btn" style="display:none;">Sign Out</button>
+                <button class="btn btn-primary btn-sm" id="signin-account-btn">Sign In / Register</button>
               </div>
             </div>
             <div id="account-vehicle-details" style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border-subtle); display:flex; gap:20px; flex-wrap:wrap; font-size:12.5px; color:var(--text-secondary);">
