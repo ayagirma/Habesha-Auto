@@ -79,45 +79,45 @@
     "brakes": {
       title: "Front Brake Pads & Rotor Resurfacing",
       urgency: "Urgency: Moderate",
-      parts: "$85.00",
-      labor: "$110.00",
-      total: "$195.00",
+      parts: "$75.00 – $95.00",
+      labor: "$100.00 – $130.00",
+      total: "$175.00 – $225.00",
       headline: "Squealing or Metallic Grinding Under Braking",
       explanation: "A high-pitched screech indicates the built-in acoustic wear clip is touching the rotor. Should be serviced promptly before rotor gouging occurs."
     },
     "engine": {
       title: "OBD-II Engine Diagnostic & Sensor Triage",
       urgency: "Urgency: High",
-      parts: "$45.00",
-      labor: "$110.00",
-      total: "$155.00",
+      parts: "$35.00 – $65.00",
+      labor: "$95.00 – $125.00",
+      total: "$130.00 – $190.00",
       headline: "Check Engine Light / Misfire Code (P0300/P0420)",
       explanation: "ECU triggered emission or combustion fault. Scan tool freeze frame analysis required to identify spark plug, ignition coil, or oxygen sensor failure."
     },
     "climate": {
       title: "AC System Vacuum & Freon Recharge",
       urgency: "Urgency: Low",
-      parts: "$65.00",
-      labor: "$100.00",
-      total: "$165.00",
+      parts: "$50.00 – $80.00",
+      labor: "$90.00 – $120.00",
+      total: "$140.00 – $200.00",
       headline: "AC Blowing Warm or Humidity in Cabin",
       explanation: "Refrigerant pressure is below optimal threshold or cabin filter is obstructed. System requires evacuation, UV dye test, and recharge."
     },
     "suspension": {
       title: "Four-Wheel Alignment & Strut Inspection",
       urgency: "Urgency: Moderate",
-      parts: "$35.00",
-      labor: "$115.00",
-      total: "$150.00",
+      parts: "$25.00 – $45.00",
+      labor: "$100.00 – $135.00",
+      total: "$125.00 – $180.00",
       headline: "Steering Pulling or Shaking Over 50 MPH",
       explanation: "Camber/toe alignment drift or tire wheel weight imbalance. Alignment machine calibration required to prevent uneven tire tread wear."
     },
     "battery": {
       title: "Battery Cold Cranking Amp Test & Replacement",
       urgency: "Urgency: Immediate",
-      parts: "$160.00",
-      labor: "$35.00",
-      total: "$195.00",
+      parts: "$140.00 – $185.00",
+      labor: "$25.00 – $45.00",
+      total: "$165.00 – $230.00",
       headline: "Slow Engine Crank or Battery Warning Light",
       explanation: "Alternator charging voltage or battery internal resistance out of spec. 12V test indicates declining reserve capacity."
     }
@@ -722,7 +722,9 @@
         document.getElementById("diag-headline").textContent = `OBD-II Code ${code} Diagnostic`;
         document.getElementById("diag-explanation").textContent = `Code ${code} indicates bank 1 sensor correlation drift or catalytic converter threshold loss. Live sensor graph & vacuum leak test recommended.`;
         document.getElementById("diag-service-name").textContent = "OBD-II Code Live Stream Diagnostic";
-        document.getElementById("diag-total").textContent = "$110.00";
+        document.getElementById("diag-parts").textContent = "$0.00 – $45.00";
+        document.getElementById("diag-labor").textContent = "$95.00 – $120.00";
+        document.getElementById("diag-total").textContent = "$95.00 – $165.00";
       });
     }
 
