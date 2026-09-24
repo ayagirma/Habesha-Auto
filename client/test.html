@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torque & Co — Automated QA & Component Health Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root {
+      --test-bg: #0d1117;
+      --test-surface: #161b22;
+      --test-border: #30363d;
+      --test-accent: #f59e0b;
+      --test-cyan: #06b6d4;
+      --test-green: #10b981;
+      --test-red: #ef4444;
+      --test-text: #f3f4f6;
+      --test-muted: #8b949e;
+    }
+    body {
+      background: var(--test-bg);
+      color: var(--test-text);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .test-header {
+      background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+      border-bottom: 1px solid var(--test-border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .test-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .test-logo-badge {
+      background: #ea580c;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+    .test-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+    .test-subtitle {
+      font-size: 12px;
+      color: var(--test-muted);
+      margin-top: 2px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-link-btn {
+      background: var(--test-surface);
+      border: 1px solid var(--test-border);
+      color: var(--test-text);
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-link-btn:hover {
+      border-color: var(--test-accent);
+      color: #fff;
+    }
+    .nav-link-btn.active {
+      background: var(--test-accent);
+      color: #000;
+      border-color: var(--test-accent);
+    }
+    .test-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .metrics-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: var(--test-surface);
+      border: 1px solid var(--test-border);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--test-border);
+    }
+    .metric-card.accent::before { background: var(--test-accent); }
+    .metric-card.green::before { background: var(--test-green); }
+    .metric-card.cyan::before { background: var(--test-cyan); }
+    .metric-card.red::before { background: var(--test-red); }
+    .metric-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--test-muted);
+    }
+    .metric-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      margin: 6px 0 2px 0;
+    }
+    .metric-sub {
+      font-size: 12px;
+      color: var(--test-muted);
+    }
+    .action-bar {
+      background: var(--test-surface);
+      border: 1px solid var(--test-border);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .btn-run-all {
+      background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+      transition: transform 0.1s, opacity 0.1s;
+    }
+    .btn-run-all:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+    .btn-run-all:active {
+      transform: translateY(0);
+    }
+    .btn-secondary {
+      background: #21262d;
+      border: 1px solid var(--test-border);
+      color: var(--test-text);
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-secondary:hover {
+      background: #30363d;
+    }
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--test-border);
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--test-muted);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      color: #fff;
+      border-bottom-color: var(--test-accent);
+    }
+    .test-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .test-row {
+      background: var(--test-surface);
+      border: 1px solid var(--test-border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      transition: border-color 0.15s;
+    }
+    .test-row:hover {
+      border-color: #484f58;
+    }
+    .test-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .test-category-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #21262d;
+      color: var(--test-muted);
+      width: fit-content;
+    }
+    .test-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .test-meta {
+      font-size: 12px;
+      color: var(--test-muted);
+    }
+    .test-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-pending {
+      background: #21262d;
+      color: var(--test-muted);
+      border: 1px solid var(--test-border);
+    }
+    .badge-running {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--test-accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-passed {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--test-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-failed {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--test-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .comp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .comp-card {
+      background: var(--test-surface);
+      border: 1px solid var(--test-border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .comp-group {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--test-cyan);
+      margin-bottom: 4px;
+    }
+    .comp-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .comp-desc {
+      font-size: 12px;
+      color: var(--test-muted);
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .comp-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: #0d1117;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #cbd5e1;
+      border: 1px solid #21262d;
+    }
+    .log-terminal {
+      background: #0d1117;
+      border: 1px solid var(--test-border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #cbd5e1;
+      height: 380px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background: #21262d;
+      border-radius: 3px;
+      margin: 12px 0 0 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ea580c, #10b981);
+      transition: width 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="test-header">
+    <div class="test-logo">
+      <span class="test-logo-badge">TORQUE & CO</span>
+      <div>
+        <h1 class="test-title">Quality Assurance & Component Health Monitor</h1>
+        <div class="test-subtitle" id="live-clock">Loading live shop clock...</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="/index.html" class="nav-link-btn">📱 Customer App</a>
+      <a href="/tech.html" class="nav-link-btn">🔧 Tech Bays</a>
+      <a href="/manager.html" class="nav-link-btn">📊 Manager Board</a>
+      <a href="/admin.html" class="nav-link-btn">👑 Staff Admin</a>
+    </nav>
+  </header>
+
+  <main class="test-container">
+
+    <!-- Metrics Ribbon -->
+    <div class="metrics-ribbon">
+      <div class="metric-card accent">
+        <div class="metric-label">Total Components</div>
+        <div class="metric-val" id="metric-total-comp">28</div>
+        <div class="metric-sub">Across 4 Portals & API</div>
+      </div>
+      <div class="metric-card green">
+        <div class="metric-label">Tests Passed</div>
+        <div class="metric-val" id="metric-passed">0</div>
+        <div class="metric-sub" id="metric-passed-sub">0 of 10 Executed</div>
+      </div>
+      <div class="metric-card red">
+        <div class="metric-label">Tests Failed</div>
+        <div class="metric-val" id="metric-failed">0</div>
+        <div class="metric-sub">0 Critical Errors</div>
+      </div>
+      <div class="metric-card cyan">
+        <div class="metric-label">Server Telemetry</div>
+        <div class="metric-val" id="metric-health" style="font-size: 22px;">PROBING...</div>
+        <div class="metric-sub" id="metric-latency">Avg Latency: -- ms</div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button id="btn-run-all" class="btn-run-all" onclick="startAllTests()">
+          <span>⚡</span> Run All Interactive Tests
+        </button>
+        <button class="btn-secondary" onclick="runBackendOnly()">📡 API Health Suite</button>
+        <button class="btn-secondary" onclick="runGeoOnly()">⏱️ GeoTime Suite</button>
+        <button class="btn-secondary" onclick="runE2EOnly()">🔄 Full E2E Workflow</button>
+      </div>
+      <button class="btn-secondary" onclick="clearLogs()">Clear Console</button>
+    </div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="suite-progress"></div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-nav" style="margin-top: 20px;">
+      <button class="tab-btn active" onclick="switchTab('tests')">🧪 Interactive Test Suite</button>
+      <button class="tab-btn" onclick="switchTab('matrix')">🧩 Component Matrix (28)</button>
+      <button class="tab-btn" onclick="switchTab('logs')">📜 Live Diagnostics Stream</button>
+    </div>
+
+    <!-- TAB 1: Tests List -->
+    <section id="tab-tests" class="test-grid">
+      <!-- Test items populated dynamically -->
+    </section>
+
+    <!-- TAB 2: Component Architecture Matrix -->
+    <section id="tab-matrix" class="comp-grid" style="display: none;">
+      <!-- Component cards populated dynamically -->
+    </section>
+
+    <!-- TAB 3: Logs Terminal -->
+    <section id="tab-logs" style="display: none;">
+      <div class="log-terminal" id="log-terminal">Initializing Torque & Co Diagnostic Console...\nReady to execute live automated test assertions.\n</div>
+    </section>
+
+  </main>
+
+  <script src="js/geo-time.js"></script>
+  <script src="js/test-runner.js"></script>
+  <script>
+    // Initialize Live Clock
+    if (window.GeoTime) {
+      window.GeoTime.bindLiveClock("live-clock");
+    }
+
+    let activeTab = 'tests';
+    function switchTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-tests').style.display = tabId === 'tests' ? 'grid' : 'none';
+      document.getElementById('tab-matrix').style.display = tabId === 'matrix' ? 'grid' : 'none';
+      document.getElementById('tab-logs').style.display = tabId === 'logs' ? 'block' : 'none';
+    }
+
+    function logMsg(text, type = 'info') {
+      const term = document.getElementById('log-terminal');
+      const timeStr = new Date().toLocaleTimeString();
+      const prefix = type === 'pass' ? '✅ [PASS]' : type === 'fail' ? '❌ [FAIL]' : 'ℹ️ [INFO]';
+      term.innerText += `[${timeStr}] ${prefix} ${text}\n`;
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function clearLogs() {
+      document.getElementById('log-terminal').innerText = 'Console cleared.\n';
+    }
+
+    // Render Component Inventory Matrix
+    function renderComponentMatrix() {
+      const container = document.getElementById('tab-matrix');
+      const comps = window.TorqueTestRunner.components;
+      document.getElementById('metric-total-comp').innerText = comps.length;
+
+      container.innerHTML = comps.map(c => `
+        <div class="comp-card">
+          <div class="comp-group">${c.group}</div>
+          <div class="comp-title">${c.name}</div>
+          <div class="comp-desc">${c.desc}</div>
+          <div class="comp-path">${c.path}</div>
+        </div>
+      `).join('');
+    }
+
+    // Render Test List
+    function renderTestList() {
+      const container = document.getElementById('tab-tests');
+      const tests = window.TorqueTestRunner.tests;
+
+      container.innerHTML = tests.map(t => `
+        <div class="test-row" id="row-${t.id}">
+          <div class="test-info">
+            <span class="test-category-tag">${t.category}</span>
+            <span class="test-name">${t.name}</span>
+            <span class="test-meta" id="meta-${t.id}">Status: Ready to execute</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="test-status-badge badge-pending" id="badge-${t.id}">PENDING</span>
+            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="runSingle('${t.id}')">Run</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function runSingle(testId) {
+      const badge = document.getElementById(`badge-${testId}`);
+      const meta = document.getElementById(`meta-${testId}`);
+      badge.className = 'test-status-badge badge-running';
+      badge.innerText = 'RUNNING...';
+
+      try {
+        const res = await window.TorqueTestRunner.runSingleTest(testId);
+        badge.className = 'test-status-badge badge-passed';
+        badge.innerText = `PASSED (${res.latency}ms)`;
+        meta.innerText = res.message;
+        logMsg(`${testId}: ${res.message}`, 'pass');
+      } catch (err) {
+        badge.className = 'test-status-badge badge-failed';
+        badge.innerText = 'FAILED';
+        meta.innerText = err.message;
+        logMsg(`${testId} Error: ${err.message}`, 'fail');
+      }
+    }
+
+    async function startAllTests() {
+      logMsg("Initiating Full Quality Assurance Suite Execution...", "info");
+      let passed = 0;
+      let failed = 0;
+      let totalLatency = 0;
+
+      const progressBar = document.getElementById('suite-progress');
+      progressBar.style.width = '0%';
+
+      const tests = window.TorqueTestRunner.tests;
+      for (let i = 0; i < tests.length; i++) {
+        const test = tests[i];
+        const badge = document.getElementById(`badge-${test.id}`);
+        const meta = document.getElementById(`meta-${test.id}`);
+        badge.className = 'test-status-badge badge-running';
+        badge.innerText = 'RUNNING...';
+
+        try {
+          const res = await test.run();
+          passed++;
+          totalLatency += res.latency;
+          badge.className = 'test-status-badge badge-passed';
+          badge.innerText = `PASSED (${res.latency}ms)`;
+          meta.innerText = res.message;
+          logMsg(`${test.name}: ${res.message}`, 'pass');
+        } catch (err) {
+          failed++;
+          badge.className = 'test-status-badge badge-failed';
+          badge.innerText = 'FAILED';
+          meta.innerText = err.message;
+          logMsg(`${test.name} FAILED: ${err.message}`, 'fail');
+        }
+
+        const pct = Math.round(((i + 1) / tests.length) * 100);
+        progressBar.style.width = pct + '%';
+        document.getElementById('metric-passed').innerText = passed;
+        document.getElementById('metric-passed-sub').innerText = `${passed} of ${tests.length} Executed`;
+        document.getElementById('metric-failed').innerText = failed;
+      }
+
+      const avgLat = passed > 0 ? Math.round(totalLatency / passed) : 0;
+      document.getElementById('metric-latency').innerText = `Avg Latency: ${avgLat} ms`;
+      document.getElementById('metric-health').innerText = failed === 0 ? 'HEALTHY (100%)' : 'DEGRADED';
+      document.getElementById('metric-health').style.color = failed === 0 ? 'var(--test-green)' : 'var(--test-red)';
+      logMsg(`Suite Completed: ${passed} passed, ${failed} failed. Average latency ${avgLat}ms.`, failed === 0 ? 'pass' : 'fail');
+    }
+
+    async function runBackendOnly() {
+      await runSingle('test-health');
+      await runSingle('test-tech-bays');
+      await runSingle('test-mgr-kpis');
+    }
+
+    async function runGeoOnly() {
+      await runSingle('test-geo-core');
+    }
+
+    async function runE2EOnly() {
+      await runSingle('test-e2e-flow');
+    }
+
+    // Initial page load
+    window.addEventListener('DOMContentLoaded', async () => {
+      renderComponentMatrix();
+      renderTestList();
+
+      // Quick initial ping
+      try {
+        const h = await window.TorqueTestRunner.apiFetch('/health');
+        if (h.ok) {
+          document.getElementById('metric-health').innerText = 'ONLINE';
+          document.getElementById('metric-health').style.color = 'var(--test-green)';
+          logMsg(`Backend API connected. Uptime: ${h.data.uptime}s • Database: ${h.data.database}`, 'pass');
+        } else {
+          document.getElementById('metric-health').innerText = 'OFFLINE';
+          document.getElementById('metric-health').style.color = 'var(--test-red)';
+        }
+      } catch (e) {
+        document.getElementById('metric-health').innerText = 'ERROR';
+      }
+
+      // Auto-run all tests on page open for instant visibility
+      startAllTests();
+    });
+  </script>
+</body>
+</html>

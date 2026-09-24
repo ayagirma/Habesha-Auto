@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torque &amp; Co — Managerial Operations &amp; Shop Floor Cockpit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Manager Cockpit Specific Styling */
+    .manager-app-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #07090C;
+    }
+    .manager-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-medium);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .manager-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent);
+    }
+    .kpi-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-mono);
+      margin: 4px 0 2px;
+    }
+    .manager-bay-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+    .manager-bay-card.has-alert {
+      border-color: rgba(255, 90, 31, 0.4);
+      background: rgba(255, 90, 31, 0.03);
+    }
+    .manager-tab-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .manager-tab-btn:hover {
+      color: var(--text-primary);
+    }
+    .manager-tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+  </style>
+</head>
+<body class="manager-app-layout">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="manager-header">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="index.html" class="brand-logo" style="text-decoration:none;">
+        <span class="logo-mark" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);">M</span>
+        <div class="logo-text">
+          <span class="brand-name">TORQUE <span class="accent-dot">&amp;</span> CO</span>
+          <span class="brand-sub">OPERATIONS &bull; MANAGERIAL COCKPIT</span>
+        </div>
+      </a>
+      <span class="pill pill-good" style="font-size:11px;">Shop Floor Online</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="font-size:12.5px; color:var(--text-secondary); text-align:right;">
+        <div style="font-weight:700; color:#fff;">Dave Miller (Shop Foreman &amp; GM)</div>
+        <div style="font-family:var(--font-mono); font-size:11px;" id="manager-clock">1:48 PM &bull; Sep 24</div>
+      </div>
+      <a href="tech.html" class="btn btn-outline btn-sm">
+        &#x26A1; Tech Terminal
+      </a>
+      <a href="test.html" class="btn btn-outline btn-sm" style="color:var(--accent); border-color:rgba(234,88,12,0.4);">
+        🧪 QA &amp; Tests
+      </a>
+      <a href="index.html" class="btn btn-outline btn-sm">
+        Customer View &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main style="flex:1; padding:24px; max-width:1440px; margin:0 auto; width:100%;">
+
+    <!-- SHOP TITLE & ACTIONS BAR -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+      <div>
+        <span class="eyebrow">Executive Telemetry</span>
+        <h1 style="font-size:24px;">Workshop Operations &amp; Bay Command</h1>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline btn-sm" id="btn-refresh-manager">&#x21bb; Live Sync</button>
+        <button class="btn btn-primary btn-sm" id="btn-open-admit-modal">+ Quick Admit Walk-in</button>
+      </div>
+    </div>
+
+    <!-- EXECUTIVE KPIS ROW -->
+    <div class="manager-kpi-grid">
+      <div class="kpi-card">
+        <span class="eyebrow" style="font-size:10.5px;">Today's Invoiced Gross</span>
+        <div class="kpi-val" id="kpi-rev">$1,485.00</div>
+        <div style="font-size:11.5px; color:var(--text-muted);">Projected: <span class="font-mono" id="kpi-proj">$2,190.00</span></div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="eyebrow" style="font-size:10.5px;">Active Bay Utilization</span>
+        <div class="kpi-val" style="color:#34d399;" id="kpi-util">75%</div>
+        <div style="font-size:11.5px; color:var(--text-muted);">3 of 4 Master Bays Occupied</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="eyebrow" style="font-size:10.5px;">Finding Approval Rate</span>
+        <div class="kpi-val" style="color:var(--accent);" id="kpi-approval">88%</div>
+        <div style="font-size:11.5px; color:var(--text-muted);">1-Click Customer Authorizations</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="eyebrow" style="font-size:10.5px;">Avg Turnaround Time</span>
+        <div class="kpi-val" id="kpi-turnaround">52 min</div>
+        <div style="font-size:11.5px; color:#34d399;">&#x2193; 8 mins vs Shop Target</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="eyebrow" style="font-size:10.5px;">Completed Today</span>
+        <div class="kpi-val" id="kpi-completed">6 Cars</div>
+        <div style="font-size:11.5px; color:var(--text-muted);">100% Quality Road Tested</div>
+      </div>
+    </div>
+
+    <!-- MASTER 4-BAY LIVE OVERSIGHT GRID -->
+    <div style="margin-bottom:28px;">
+      <div class="section-header" style="margin-bottom:14px;">
+        <div>
+          <span class="eyebrow">Real-Time Workshop Floor</span>
+          <h2 style="font-size:18px;">Active Bays &amp; Vehicle Progress</h2>
+        </div>
+        <span class="pill pill-good">Auto-Syncing Live</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px;" id="manager-bays-grid">
+        <!-- Injected by manager.js -->
+      </div>
+    </div>
+
+    <!-- 2-COLUMN MANAGEMENT SECTION -->
+    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:24px;">
+
+      <!-- LEFT: Findings Gatekeeper & Manager Authorization Queue -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="card card-elevated">
+          <div class="section-header" style="margin-bottom:14px;">
+            <div>
+              <span class="eyebrow" style="color:var(--accent);">Gatekeeper Protocol</span>
+              <h3 style="font-size:17px;">Inspection Findings &amp; Customer Authorization</h3>
+            </div>
+            <span class="pill pill-warn" id="pending-findings-count">1 Action Required</span>
+          </div>
+
+          <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:14px;">
+            Shop Protocol: All technician-spotted wear or hidden issues are pre-vetted by the foreman before being dispatched to the customer.
+          </p>
+
+          <div id="manager-findings-list" style="display:flex; flex-direction:column; gap:14px;">
+            <!-- Injected by manager.js -->
+          </div>
+        </div>
+
+        <!-- Intake Queue & Upcoming Scheduled Bookings -->
+        <div class="card">
+          <div class="section-header" style="margin-bottom:12px;">
+            <div>
+              <span class="eyebrow">Intake Logistics</span>
+              <h3 style="font-size:17px;">Arrival Queue &amp; Check-ins</h3>
+            </div>
+          </div>
+
+          <div id="manager-queue-list" style="display:flex; flex-direction:column; gap:10px;">
+            <!-- Injected by manager.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Technician Productivity & Staff Roster -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+
+        <div class="card">
+          <div class="section-header" style="margin-bottom:14px;">
+            <div>
+              <span class="eyebrow">Workforce Management</span>
+              <h3 style="font-size:17px;">Technician Shift &amp; Efficiency Roster</h3>
+            </div>
+          </div>
+
+          <div id="manager-techs-list" style="display:flex; flex-direction:column; gap:12px;">
+            <!-- Injected by manager.js -->
+          </div>
+        </div>
+
+        <!-- Shop Policy & Fallback Protocol Reference -->
+        <div class="card" style="background:var(--bg-input); border-left:4px solid var(--accent);">
+          <span class="eyebrow" style="color:var(--accent);">No-Surprise Billing Rule</span>
+          <h4 style="font-size:14px; margin:4px 0 6px; color:#fff;">Automatic Work Order Safety Fallback</h4>
+          <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+            If a customer has not responded to an estimate finding prior to target bay completion time, technicians are mandated to finish only the approved original services. No unauthorized charges or unauthorized repairs may ever be applied.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== MODAL: ADMIT WALK-IN CUSTOMER ==================== -->
+  <div class="modal-overlay" id="admit-modal">
+    <div class="modal-card" style="max-width:500px;">
+      <div class="section-header" style="margin-bottom:16px;">
+        <div>
+          <span class="eyebrow">Floor Management</span>
+          <h3 style="font-size:19px;">Admit Vehicle to Workshop</h3>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="close-admit-modal-btn">&times;</button>
+      </div>
+
+      <form id="admit-form" style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="field-group">
+            <label class="field-label" for="admit-name">Customer Name</label>
+            <input type="text" class="field-input" id="admit-name" placeholder="e.g. Taylor Brooks" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="admit-phone">Phone Number</label>
+            <input type="tel" class="field-input" id="admit-phone" placeholder="(555) 000-0000" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="admit-vehicle">Year, Make &amp; Model</label>
+          <input type="text" class="field-input" id="admit-vehicle" placeholder="e.g. 2023 Tesla Model 3" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:10px;">
+          <div class="field-group">
+            <label class="field-label" for="admit-plate">License Plate</label>
+            <input type="text" class="field-input font-mono" id="admit-plate" placeholder="9ELC321" style="text-transform:uppercase;">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="admit-bay">Assign Bay</label>
+            <select class="field-input" id="admit-bay">
+              <option value="bay-4">Bay 4 (EV / Alignment - Open)</option>
+              <option value="bay-1">Bay 1 (Intake Diagnostics)</option>
+              <option value="bay-2">Bay 2 (Lift 1)</option>
+              <option value="bay-3">Bay 3 (Lift 2)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="admit-service">Service Requested</label>
+          <input type="text" class="field-input" id="admit-service" placeholder="e.g. Precision Alignment &amp; Road Force Balance" required>
+        </div>
+
+        <button class="btn btn-primary" type="submit" style="width:100%; margin-top:8px;">
+          Admit Vehicle &amp; Allocate Bay
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/geo-time.js"></script>
+  <script src="js/manager.js"></script>
+</body>
+</html>

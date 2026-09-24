@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Torque &amp; Co — Technician Bay Terminal &amp; Manager Cockpit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Workshop Terminal Specific Styling */
+    .tech-app-layout {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #090B0E;
+    }
+    .tech-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-medium);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tech-bay-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .bay-card-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .bay-card-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .bay-card-btn.active {
+      border-color: var(--accent);
+      background: rgba(255, 90, 31, 0.06);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .bay-card-btn.active::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .tech-step-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+      align-items: flex-start;
+      transition: all 0.2s ease;
+    }
+    .tech-step-item.completed {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.04);
+    }
+    .tech-step-item.active {
+      border-color: var(--accent);
+      background: rgba(255, 90, 31, 0.05);
+      box-shadow: 0 0 16px rgba(255, 90, 31, 0.1);
+    }
+    .step-number-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+      background: var(--bg-input);
+      border: 1px solid var(--border-medium);
+      color: var(--text-muted);
+    }
+    .tech-step-item.completed .step-number-badge {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+    .tech-step-item.active .step-number-badge {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .call-log-badge {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body class="tech-app-layout">
+
+  <!-- ==================== HEADER / TOP BAR ==================== -->
+  <header class="tech-header">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="index.html" class="brand-logo" style="text-decoration:none;">
+        <span class="logo-mark">T</span>
+        <div class="logo-text">
+          <span class="brand-name">TORQUE <span class="accent-dot">&amp;</span> CO</span>
+          <span class="brand-sub">BAY TERMINAL &bull; STAFF CONSOLE</span>
+        </div>
+      </a>
+      <span class="pill pill-accent" style="font-size:11px;">Technician &amp; Foreman Mode</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="font-size:12.5px; color:var(--text-secondary); text-align:right;">
+        <div style="font-weight:700; color:#fff;" id="tech-logged-name">Marcus Vance (Bay 3 Lead)</div>
+        <div style="font-family:var(--font-mono); font-size:11px;" id="live-clock">1:45 PM &bull; Sep 24</div>
+      </div>
+      <a href="manager.html" class="btn btn-outline btn-sm" style="border-color:var(--border-subtle);">
+        &#x1F454; Manager Cockpit
+      </a>
+      <a href="test.html" class="btn btn-outline btn-sm" style="color:var(--accent); border-color:rgba(234,88,12,0.4);">
+        🧪 QA &amp; Tests
+      </a>
+      <a href="index.html" class="btn btn-outline btn-sm">
+        &larr; Customer View
+      </a>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSHOP VIEWPORT ==================== -->
+  <main style="flex:1; padding:24px; max-width:1440px; margin:0 auto; width:100%;">
+
+    <!-- SHOP FOREMAN / BAY STATUS OVERVIEW TABS -->
+    <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <span class="eyebrow">Shop Floor Management</span>
+        <h1 style="font-size:24px;">Active Service Bays &amp; Work Orders</h1>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-outline btn-sm" id="refresh-bays-btn">&#x21bb; Refresh Bays</button>
+        <button class="btn btn-primary btn-sm" id="btn-open-finding-modal">+ Flag Hidden Issue</button>
+      </div>
+    </div>
+
+    <!-- 4-BAY QUICK SELECTOR -->
+    <div class="tech-bay-grid" id="bay-selector-grid">
+      <!-- Injected by tech.js -->
+    </div>
+
+    <!-- ACTIVE WORK ORDER DETAIL COCKPIT -->
+    <div style="display:grid; grid-template-columns: 1.6fr 1fr; gap:24px; align-items:start;" id="active-bay-cockpit">
+      
+      <!-- LEFT COLUMN: Vehicle Details, Step-by-Step Task Checklist, Finding Protocol -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+
+        <!-- Vehicle & Work Order Card -->
+        <div class="card card-elevated">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span class="eyebrow" id="wo-bay-label">Bay 3 &bull; Lift 2</span>
+              <h2 style="font-size:20px; color:#fff;" id="wo-vehicle-title">2021 Honda Accord EX-L</h2>
+              <div style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+                Plate: <strong class="font-mono" style="color:#fff;" id="wo-plate-display">7XYZ890</strong> &bull;
+                VIN: <strong class="font-mono" style="color:#fff;" id="wo-vin-display">1HGCM82633A004352</strong> &bull;
+                <span id="wo-miles-display">62,140 miles</span>
+              </div>
+            </div>
+
+            <!-- Quick Intake Scan / Edit VIN Button -->
+            <button class="btn btn-outline btn-sm" id="btn-scan-vin-modal" style="font-size:12px;">
+              &#x1F4F7; Verify / Scan VIN
+            </button>
+          </div>
+
+          <!-- Service Specs Banner -->
+          <div style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="font-size:11.5px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Booked Service</div>
+              <div style="font-weight:700; color:var(--accent); font-size:14.5px;" id="wo-service-name">Full Synthetic Oil &amp; Filter + 30-Pt Safety Check</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11.5px; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Target Finish Time</div>
+              <div class="font-mono" style="font-weight:700; font-size:15px; color:#34d399;" id="wo-eta-display">2:45 PM (On Track)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Interactive Workflow List -->
+        <div class="card">
+          <div class="section-header" style="margin-bottom:14px;">
+            <div>
+              <span class="eyebrow">Work Order Execution</span>
+              <h3 style="font-size:17px;">Step-by-Step Bay Checklist</h3>
+            </div>
+            <span class="pill pill-good" id="wo-step-progress-pill">Step 3 of 5 In Progress</span>
+          </div>
+
+          <div id="tech-steps-container">
+            <!-- Injected by tech.js -->
+          </div>
+        </div>
+
+        <!-- Hidden Finding & Manager Protocol Card -->
+        <div class="card" id="wo-finding-card" style="border-left: 4px solid var(--accent);">
+          <div class="section-header" style="margin-bottom:10px;">
+            <div>
+              <span class="eyebrow" style="color:var(--accent);">Active Finding &bull; Customer Approval</span>
+              <h3 style="font-size:17px;" id="fnd-title-display">Serpentine Drive Belt Micro-Cracking</h3>
+            </div>
+            <span class="pill pill-warn" id="fnd-status-badge">Awaiting Customer Approval ($96.00)</span>
+          </div>
+
+          <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;" id="fnd-desc-display">
+            Surface rib cracking observed during 30-pt safety check. Belt tensioner is at 80% deflection. Failure will cause alternator &amp; power steering loss.
+          </p>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:10px 14px; border-radius:var(--radius-sm); margin:12px 0; font-size:12.5px;">
+            <div><strong>Parts:</strong> $38.00 &bull; <strong>Labor:</strong> $58.00 &bull; <strong>Total:</strong> <span class="font-mono" style="color:#fff; font-weight:700;">$96.00</span></div>
+            <div style="color:#34d399; font-weight:600;">&#x2714; Can complete on current lift slot</div>
+          </div>
+
+          <!-- Protocol & Fallback Controls -->
+          <div style="background:rgba(255, 90, 31, 0.08); border:1px dashed var(--accent-soft); border-radius:var(--radius-sm); padding:12px 14px; margin-top:8px;">
+            <div style="font-size:12px; font-weight:700; color:var(--accent); margin-bottom:4px;">
+              &#x26A0; Shop Protocol &bull; No-Response Rule
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:10px;" id="wo-protocol-cutoff-text">
+              If customer does not answer or reply before the completion cutoff, proceed to complete original booked services only. 100% transparency — no unauthorized additions.
+            </p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" id="btn-direct-call">
+                &#x1F4DE; Direct Call Customer (<span id="wo-cust-phone-btn">(555) 010-2938</span>)
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btn-manual-override-approve">
+                &#x2713; Customer Approved by Phone
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Customer Contacts, Direct Phone Action, Call Logs, Vehicle History -->
+      <div style="display:flex; flex-direction:column; gap:20px;">
+
+        <!-- Customer Card & Direct Call Action -->
+        <div class="card">
+          <span class="eyebrow">Customer &amp; Contact Protocol</span>
+          <div style="display:flex; align-items:center; gap:14px; margin:12px 0 16px;">
+            <div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#801A00); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:#fff;" id="wo-cust-avatar">
+              GA
+            </div>
+            <div style="flex:1;">
+              <h3 style="font-size:16px;" id="wo-cust-name">Girma Ayele</h3>
+              <div style="font-size:12.5px; color:var(--text-secondary);" id="wo-cust-phone">(555) 010-2938</div>
+              <div style="font-size:12px; color:var(--text-muted);" id="wo-cust-email">ayagirma@gmail.com</div>
+            </div>
+          </div>
+
+          <a href="tel:5550102938" class="btn btn-primary btn-full" id="wo-call-tel-link" style="margin-bottom:8px;">
+            &#x1F4DE; Call Customer Now
+          </a>
+          <button class="btn btn-outline btn-sm btn-full" id="btn-log-call-attempt">
+            + Log Call Attempt / Voicemail
+          </button>
+
+          <!-- Call Logs Container -->
+          <div style="margin-top:16px; border-top:1px solid var(--border-subtle); padding-top:12px;">
+            <span class="eyebrow" style="font-size:10.5px; margin-bottom:6px; display:block;">Call &amp; Communication History</span>
+            <div id="wo-call-logs-list" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Injected by tech.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Permanent VIN Vehicle Maintenance History -->
+        <div class="card">
+          <div class="section-header" style="margin-bottom:12px;">
+            <div>
+              <span class="eyebrow">Permanent VIN Passport</span>
+              <h3 style="font-size:16px;">Previous Shop Visits &amp; Notes</h3>
+            </div>
+          </div>
+
+          <div id="wo-past-history-list" style="display:flex; flex-direction:column; gap:10px;">
+            <!-- Injected by tech.js -->
+          </div>
+        </div>
+
+        <!-- Manager Oversight Stamp -->
+        <div class="card" style="background:var(--bg-input);">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:32px; height:32px; border-radius:50%; background:rgba(16, 185, 129, 0.15); display:flex; align-items:center; justify-content:center; color:#34d399; font-weight:700;">
+              &#x2714;
+            </div>
+            <div>
+              <div style="font-weight:700; font-size:13px; color:#fff;">Shop Manager Pre-Approval</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">Foreman Dave Miller verified finding estimate.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==================== MODAL: SCAN / VERIFY VIN ==================== -->
+  <div class="modal-overlay" id="scan-vin-modal">
+    <div class="modal-card" style="max-width:480px;">
+      <div class="section-header" style="margin-bottom:16px;">
+        <div>
+          <span class="eyebrow">Vehicle Admission &bull; Bay 1</span>
+          <h3 style="font-size:19px;">Verify / Scan Vehicle VIN</h3>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="close-scan-vin-modal-btn">&times;</button>
+      </div>
+
+      <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+        Plug in OBD-II scanner or scan windshield/door-jamb barcode to log the permanent 17-digit VIN.
+      </p>
+
+      <form id="scan-vin-form" style="display:flex; flex-direction:column; gap:14px;">
+        <div class="field-group">
+          <label class="field-label" for="scan-vin-input">17-Digit Vehicle VIN</label>
+          <input type="text" class="field-input font-mono" id="scan-vin-input" placeholder="1HGCM82633A004352" maxlength="17" style="text-transform:uppercase; font-size:15px; font-weight:700;" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="scan-plate-input">License Plate</label>
+          <input type="text" class="field-input font-mono" id="scan-plate-input" placeholder="7XYZ890" style="text-transform:uppercase;">
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <button class="btn btn-outline" type="button" id="btn-simulate-obd-scan" style="flex:1;">
+            &#x26A1; Auto-Scan OBD-II
+          </button>
+          <button class="btn btn-primary" type="submit" style="flex:1;">
+            Save &amp; Verify VIN
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: FLAG HIDDEN ISSUE / FINDING ==================== -->
+  <div class="modal-overlay" id="finding-protocol-modal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="section-header" style="margin-bottom:16px;">
+        <div>
+          <span class="eyebrow">Inspection Discovery</span>
+          <h3 style="font-size:19px;">Flag Hidden Issue / Future Wear</h3>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="close-finding-modal-btn">&times;</button>
+      </div>
+
+      <form id="finding-protocol-form" style="display:flex; flex-direction:column; gap:12px;">
+        <div class="field-group">
+          <label class="field-label" for="fnd-title-input">Discovered Component / Issue</label>
+          <input type="text" class="field-input" id="fnd-title-input" placeholder="e.g. Serpentine Belt Cracking or Rear Brake Pad 2mm" required>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="fnd-desc-input">Explanation &amp; Diagnostic Proof for Customer</label>
+          <textarea class="field-input" id="fnd-desc-input" rows="3" placeholder="Explain what was spotted, why it matters, and risk if deferred..." required></textarea>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+          <div class="field-group">
+            <label class="field-label" for="fnd-parts-input">Parts Cost ($)</label>
+            <input type="number" step="0.01" class="field-input" id="fnd-parts-input" placeholder="38.00" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="fnd-labor-input">Labor Cost ($)</label>
+            <input type="number" step="0.01" class="field-input" id="fnd-labor-input" placeholder="58.00" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="fnd-urgency-select">Urgency</label>
+            <select class="field-input" id="fnd-urgency-select">
+              <option value="Recommended Today">Recommended Today</option>
+              <option value="Safety Critical">Safety Critical</option>
+              <option value="Monitor Next Visit">Monitor Next Visit</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Manager Pre-Approval Check -->
+        <div style="background:var(--bg-input); border:1px solid var(--border-subtle); padding:12px; border-radius:var(--radius-sm);">
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; font-size:13px; color:#fff;">
+            <input type="checkbox" id="fnd-manager-check" checked>
+            Reviewed &amp; Verified with Shop Foreman (Dave Miller)
+          </label>
+          <p style="font-size:11.5px; color:var(--text-muted); margin-top:4px; margin-left:22px;">
+            Shop protocol requires foreman verbal sign-off before sending estimate quote to customer.
+          </p>
+        </div>
+
+        <button class="btn btn-primary" type="submit" style="width:100%; margin-top:6px;">
+          Send Instant 1-Click Approval Request to Customer
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/geo-time.js"></script>
+  <script src="js/tech.js"></script>
+</body>
+</html>

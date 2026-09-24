@@ -1,0 +1,82 @@
+========================================================================================
+⚡ HABESHA AUTO — VS CODE TERMINAL COMMAND CHEATSHEET
+========================================================================================
+Open the VS Code Terminal (Ctrl + ` or Terminal > New Terminal) in "e:\torque-app"
+and copy-paste any of the commands below.
+
+----------------------------------------------------------------------------------------
+1) ADD / ONBOARD A TECHNICIAN OR ASSIGN A SHOP MANAGER
+----------------------------------------------------------------------------------------
+
+• Add / Register a Technician:
+  node server/scripts/manage.js add-staff "Marcus Vance" "marcus.vance@torque.com" "(555) 902-2200" "technician" "EV Diagnostics & Alignment"
+
+• Add / Assign a Shop Manager:
+  node server/scripts/manage.js add-staff "Dave Miller" "dave.miller@torque.com" "(555) 902-1100" "manager" "Shop Foreman & Dispatch"
+
+• Open Staff Console in Browser:
+  http://localhost:3000/admin
+
+
+----------------------------------------------------------------------------------------
+2) REGISTER A CUSTOMER WHO IS NOT ABLE TO SIGN IN OR RESET THEIR PASSWORD
+----------------------------------------------------------------------------------------
+
+• Register a New Customer Account with Vehicle:
+  Format:
+  node server/scripts/manage.js add-customer "<Full Name>" "<Email>" "<Phone>" "<Password>" "<Vehicle Year/Make/Model>" "<Plate (Optional)>"
+
+  Example:
+  node server/scripts/manage.js add-customer "Alex Rivera" "alex.rivera@example.com" "(555) 392-8812" "password123" "2023 Tesla Model Y" "8TSL101"
+
+• Reset Password for Any Customer / Staff Account:
+  Format:
+  node server/scripts/manage.js set-password "<Email>" "<NewPassword>"
+
+  Example:
+  node server/scripts/manage.js set-password "ayagirma@gmail.com" "newpassword123"
+
+• Delete an unwanted user:
+  node server/scripts/manage.js delete-user "olduser@example.com"
+
+
+----------------------------------------------------------------------------------------
+3) MAKE SURE WHAT IS ON THE DATABASE (TABLE QUERIES & LIVE CHECKS)
+----------------------------------------------------------------------------------------
+
+• View all registered users:
+  node server/scripts/manage.js list-users
+
+• View all linked customer vehicles:
+  node server/scripts/manage.js list-vehicles
+
+• View all active appointments & work orders:
+  node server/scripts/manage.js list-appointments
+
+• View recent OTP password reset codes:
+  node server/scripts/manage.js list-resets
+
+• Run ANY custom SQL query:
+  Format:
+  node server/scripts/manage.js query "<SQL Query>"
+
+  Examples:
+  node server/scripts/manage.js query "SELECT id, name, email, phone FROM users"
+  node server/scripts/manage.js query "SELECT * FROM vehicles"
+  node server/scripts/manage.js query "SELECT id, user_id, status_label, base_price FROM appointments"
+  node server/scripts/manage.js query "SELECT * FROM messages ORDER BY at DESC"
+
+
+----------------------------------------------------------------------------------------
+4) SERVER & SYSTEM DIAGNOSTICS
+----------------------------------------------------------------------------------------
+
+• Run Dev Server:
+  npm run dev
+
+• Run All System Tests (27 test suites):
+  npm test
+
+• Check Database Connectivity & Schema Setup:
+  npm run db:setup
+========================================================================================
