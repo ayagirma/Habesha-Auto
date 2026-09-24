@@ -106,7 +106,7 @@ let baysState = [
       totalCost: 96.00,
       urgency: "Recommended Today (Can complete without rescheduling)",
       managerApproved: true,
-      managerName: "Dave Miller (Shop Foreman)",
+      managerName: "Girma Ayele (Shop Manager)",
       customerStatus: "pending", // pending, approved, declined
       notifiedAt: getRelativeTimeStr(-15),
       canFixOnSite: true
@@ -291,7 +291,7 @@ router.post('/bays/:id/finding', (req, res) => {
     totalCost: parts + labor,
     urgency: urgency || "Recommended Today",
     managerApproved: Boolean(managerApproved),
-    managerName: managerName || "Dave Miller (Shop Foreman)",
+    managerName: managerName || "Girma Ayele (Shop Manager)",
     customerStatus: "pending",
     notifiedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     canFixOnSite: canFixOnSite !== false

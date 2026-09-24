@@ -12,7 +12,7 @@ and copy-paste any of the commands below.
   node server/scripts/manage.js add-staff "Marcus Vance" "marcus.vance@torque.com" "(555) 902-2200" "technician" "EV Diagnostics & Alignment"
 
 • Add / Assign a Shop Manager:
-  node server/scripts/manage.js add-staff "Dave Miller" "dave.miller@torque.com" "(555) 902-1100" "manager" "Shop Foreman & Dispatch"
+  node server/scripts/manage.js add-staff "Girma Ayele" "girma.ayele@habeshaauto.com" "(555) 902-1100" "manager" "Shop Manager & Dispatch"
 
 • Open Staff Console in Browser:
   http://localhost:3000/admin

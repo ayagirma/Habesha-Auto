@@ -35,7 +35,7 @@ AVAILABLE ACTIONS:
 4. REGISTER / ONBOARD STAFF (Manager or Technician):
    node server/scripts/manage.js add-staff "<Name>" "<Email>" "<Phone>" "<Role: manager|technician>" "<Specialization>"
    Example:
-   node server/scripts/manage.js add-staff "Dave Miller" "dave.miller@torque.com" "(555) 902-1100" "manager" "Shop Foreman"
+   node server/scripts/manage.js add-staff "Girma Ayele" "girma.ayele@habeshaauto.com" "(555) 902-1100" "manager" "Shop Manager"
    node server/scripts/manage.js add-staff "Marcus Vance" "marcus.vance@torque.com" "(555) 902-2200" "technician" "EV Diagnostics & Alignment"
 
 5. DELETE A USER:

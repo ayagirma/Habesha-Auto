@@ -410,7 +410,7 @@
             laborCost: labor,
             urgency,
             managerApproved,
-            managerName: "Dave Miller (Shop Foreman)",
+            managerName: "Girma Ayele (Shop Manager)",
             canFixOnSite: true
           });
 

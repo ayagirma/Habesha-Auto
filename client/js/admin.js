@@ -102,7 +102,7 @@
       }
       if (adminLogoBadge) adminLogoBadge.style.background = "linear-gradient(135deg,#3B82F6,#1D4ED8)";
       if (adminSubTitle) adminSubTitle.textContent = "OPERATIONS &bull; MANAGERIAL COCKPIT";
-      if (adminUserName) adminUserName.textContent = staffUser ? staffUser.name : "Dave Miller";
+      if (adminUserName) adminUserName.textContent = staffUser ? staffUser.name : "Girma Ayele";
       fetchManagerData();
       return;
     }
@@ -624,12 +624,12 @@
     if (btnQuickMgr) {
       btnQuickMgr.addEventListener("click", () => {
         staffUser = {
-          name: "Dave Miller",
-          email: "dave.miller@torque.com",
+          name: "Girma Ayele",
+          email: "girma.ayele@habeshaauto.com",
           role: "manager",
           status: "active"
         };
-        showToast("Logged in as Shop Foreman (Dave Miller)", "success");
+        showToast("Logged in as Shop Manager (Girma Ayele)", "success");
         switchView("manager");
       });
     }
@@ -658,8 +658,8 @@
           showToast("Welcome back, Marcus!", "success");
           switchView("tech");
         } else {
-          staffUser = { name: "Dave Miller", email, role: "manager", status: "active" };
-          showToast("Welcome back, Foreman Dave!", "success");
+          staffUser = { name: "Girma Ayele", email, role: "manager", status: "active" };
+          showToast("Welcome back, Manager Girma!", "success");
           switchView("manager");
         }
       });
@@ -780,8 +780,8 @@
     initEventListeners();
     // Default to manager demo or auth view
     staffUser = {
-      name: "Dave Miller",
-      email: "dave.miller@torque.com",
+      name: "Girma Ayele",
+      email: "girma.ayele@habeshaauto.com",
       role: "manager",
       status: "active"
     };
