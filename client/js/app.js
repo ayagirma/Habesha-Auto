@@ -1247,6 +1247,18 @@
         accountUserContact.innerHTML = `${state.user.email || 'guest@torqueandco.com'} &bull; ${state.user.phone || '(555) 010-2938'}`;
       }
 
+      const dropdownAvatar = document.getElementById("dropdown-avatar");
+      const dropdownUserName = document.getElementById("dropdown-user-name");
+      const dropdownUserEmail = document.getElementById("dropdown-user-email");
+      const dropdownSigninBtn = document.getElementById("dropdown-signin-btn");
+      const dropdownSignoutBtn = document.getElementById("dropdown-signout-btn");
+
+      if (dropdownAvatar) dropdownAvatar.textContent = state.isAuthenticated ? initials : "GD";
+      if (dropdownUserName) dropdownUserName.textContent = state.isAuthenticated ? (state.user.name || "Customer Account") : "Guest Driver";
+      if (dropdownUserEmail) dropdownUserEmail.textContent = state.isAuthenticated ? (state.user.email || "") : "guest@torqueandco.com (Demo)";
+      if (dropdownSigninBtn) dropdownSigninBtn.style.display = state.isAuthenticated ? "none" : "flex";
+      if (dropdownSignoutBtn) dropdownSignoutBtn.style.display = state.isAuthenticated ? "flex" : "flex";
+
       const currentVeh = state.vehicles[state.activeVehicleIndex] || state.vehicles[0];
       if (currentVeh) {
         if (vinDisplay) vinDisplay.textContent = currentVeh.vin || "1HGCM82633A004352";
@@ -1488,6 +1500,64 @@
 
     if (signoutBtn) {
       signoutBtn.addEventListener("click", handleSignOut);
+    }
+
+    // User Header Dropdown Menu Controls
+    const userDropdownMenu = document.getElementById("user-dropdown-menu");
+    const dropdownNavAccount = document.getElementById("dropdown-nav-account");
+    const dropdownNavGarage = document.getElementById("dropdown-nav-garage");
+    const dropdownSigninBtn = document.getElementById("dropdown-signin-btn");
+    const dropdownSignoutBtn = document.getElementById("dropdown-signout-btn");
+
+    function closeUserDropdown() {
+      if (userDropdownMenu) userDropdownMenu.style.display = "none";
+    }
+
+    function toggleUserDropdown(e) {
+      if (e) e.stopPropagation();
+      if (!userDropdownMenu) return;
+      const isShowing = userDropdownMenu.style.display === "block";
+      userDropdownMenu.style.display = isShowing ? "none" : "block";
+    }
+
+    if (navAvatar) {
+      navAvatar.addEventListener("click", toggleUserDropdown);
+    }
+
+    document.addEventListener("click", (e) => {
+      if (userDropdownMenu && userDropdownMenu.style.display === "block") {
+        if (!e.target.closest(".user-menu-wrapper")) {
+          closeUserDropdown();
+        }
+      }
+    });
+
+    if (dropdownNavAccount) {
+      dropdownNavAccount.addEventListener("click", () => {
+        closeUserDropdown();
+        navigateTo("account");
+      });
+    }
+
+    if (dropdownNavGarage) {
+      dropdownNavGarage.addEventListener("click", () => {
+        closeUserDropdown();
+        openGarage();
+      });
+    }
+
+    if (dropdownSigninBtn) {
+      dropdownSigninBtn.addEventListener("click", () => {
+        closeUserDropdown();
+        openAuthModal("signin");
+      });
+    }
+
+    if (dropdownSignoutBtn) {
+      dropdownSignoutBtn.addEventListener("click", () => {
+        closeUserDropdown();
+        handleSignOut();
+      });
     }
 
     // Initial Auth Check

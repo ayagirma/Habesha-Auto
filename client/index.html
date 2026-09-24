@@ -78,9 +78,34 @@
         <span id="nav-bay-status-text">Bay 3 Active</span>
       </div>
       <button class="btn btn-outline btn-sm" id="nav-auth-btn">Sign In</button>
-      <button class="user-avatar-btn" data-nav="account" id="nav-user-avatar" title="Guest Driver — View Vehicle Passport &amp; History">
-        GD
-      </button>
+      <div class="user-menu-wrapper" style="position:relative;">
+        <button class="user-avatar-btn" id="nav-user-avatar" title="Account Menu &amp; Sign Out">
+          GD
+        </button>
+        <div class="user-dropdown-menu" id="user-dropdown-menu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); width:260px; background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:12px; padding:12px; box-shadow:0 12px 32px rgba(0,0,0,0.5); z-index:100; backdrop-filter:blur(16px);">
+          <div style="display:flex; align-items:center; gap:12px; padding-bottom:10px; border-bottom:1px solid var(--border-subtle); margin-bottom:8px;">
+            <div id="dropdown-avatar" style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#801A00); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#fff; flex-shrink:0;">GD</div>
+            <div style="min-width:0; flex:1;">
+              <div style="font-weight:600; font-size:13.5px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="dropdown-user-name">Guest Driver</div>
+              <div style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="dropdown-user-email">guest@torqueandco.com</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <button class="dropdown-item-btn" id="dropdown-nav-account" style="display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:none; background:none; color:var(--text-primary); font-size:12.5px; border-radius:6px; cursor:pointer; text-align:left; transition:background 0.15s;">
+              <span>📜</span> Vehicle History &amp; Passport
+            </button>
+            <button class="dropdown-item-btn" id="dropdown-nav-garage" style="display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:none; background:none; color:var(--text-primary); font-size:12.5px; border-radius:6px; cursor:pointer; text-align:left; transition:background 0.15s;">
+              <span>🚗</span> Switch / Add Vehicle
+            </button>
+            <button class="dropdown-item-btn" id="dropdown-signin-btn" style="display:none; align-items:center; gap:10px; width:100%; padding:8px 10px; border:none; background:var(--accent-soft); color:var(--accent); font-size:12.5px; font-weight:600; border-radius:6px; cursor:pointer; text-align:left; transition:all 0.15s; margin-top:4px;">
+              <span>🔑</span> Sign In / Register
+            </button>
+            <button class="dropdown-item-btn" id="dropdown-signout-btn" style="display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border:none; background:rgba(239,68,68,0.1); color:#ef4444; font-size:12.5px; font-weight:600; border-radius:6px; cursor:pointer; text-align:left; transition:all 0.15s; margin-top:4px;">
+              <span>🚪</span> Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
