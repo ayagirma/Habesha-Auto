@@ -16,6 +16,7 @@ yarn-error.log*
 
 # Vercel & Cloud Build artifacts
 .vercel
+
 .output
 dist/
 coverage/

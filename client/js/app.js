@@ -184,7 +184,7 @@
     vehicles: JSON.parse(JSON.stringify(DEFAULT_VEHICLES)),
     activeVehicleIndex: 0,
     booking: {
-      selectedServices: ["oil-syn"],
+      selectedServices: [],
       date: (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(1)[0] : { dow: "Today", num: new Date().getDate(), month: "Sep" },
       time: "2:00 PM",
       mobility: "wait"
@@ -366,12 +366,7 @@
         el.addEventListener("click", () => {
           const id = el.getAttribute("data-id");
           if (state.booking.selectedServices.includes(id)) {
-            if (state.booking.selectedServices.length > 1) {
-              state.booking.selectedServices = state.booking.selectedServices.filter(x => x !== id);
-            } else {
-              showToast("At least one service must be selected.", "warning");
-              return;
-            }
+            state.booking.selectedServices = state.booking.selectedServices.filter(x => x !== id);
           } else {
             state.booking.selectedServices.push(id);
           }
@@ -740,6 +735,10 @@
     const confirmBookingBtn = document.getElementById("confirm-booking-btn");
     if (confirmBookingBtn) {
       confirmBookingBtn.addEventListener("click", () => {
+        if (!state.booking.selectedServices.length) {
+          showToast("Please select at least one service to book.", "warning");
+          return;
+        }
         showToast("Appointment confirmed! Your bay has been allocated.", "success");
         state.progress.stepIndex = 0;
         if (state.isAuthenticated && typeof api !== "undefined") {
@@ -750,7 +749,7 @@
             stepIndex: 0,
             status: "in-progress",
             statusLabel: "Bay 3 Active",
-            basePrice: 89.00
+            basePrice: calculateBookingTotal()
           });
         }
         navigateTo("progress");
@@ -1489,7 +1488,7 @@
       state.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
       state.messages = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
       state.progress.stepIndex = 2;
-      state.booking.selectedServices = ["oil-syn"];
+      state.booking.selectedServices = [];
 
       updateAuthUI();
       renderHome();
