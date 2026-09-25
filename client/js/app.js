@@ -185,10 +185,19 @@
     activeVehicleIndex: 0,
     booking: {
       selectedServices: [],
-      date: (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(1)[0] : { dow: "Today", num: new Date().getDate(), month: "Sep" },
-      time: "2:00 PM",
+      date: (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(7).find(d => !d.isClosed) : { dow: "Today", num: new Date().getDate(), month: "Sep", isToday: true },
+      time: "8:00 AM",
       mobility: "wait"
     },
+    appointment: (() => {
+      try {
+        const saved = localStorage.getItem("habesha_active_appt");
+        return saved ? JSON.parse(saved) : null;
+      } catch (e) {
+        return null;
+      }
+    })(),
+    liveDemoMode: false,
     progress: {
       stepIndex: 2, // 0 to 4
       findingApproved: null, // null, true, false
@@ -312,16 +321,27 @@
     // Step preview & dynamic ETA on Home
     const fill = document.getElementById("dash-progress-fill");
     const stepLabel = document.getElementById("dash-step-text");
-    const steps = getServiceSteps(state.progress.stepIndex);
-    if (fill && stepLabel) {
-      const pct = Math.round(((state.progress.stepIndex + 1) / steps.length) * 100);
-      fill.style.width = pct + "%";
-      stepLabel.textContent = `Step ${state.progress.stepIndex + 1} of ${steps.length}: ${steps[state.progress.stepIndex].title}`;
-    }
-
     const estFinish = document.getElementById("dash-est-finish");
-    if (estFinish && window.GeoTime) {
-      estFinish.textContent = window.GeoTime.getDynamicETA(state.progress.stepIndex);
+
+    if (state.appointment && state.appointment.status === "scheduled" && !state.liveDemoMode) {
+      if (fill) fill.style.width = "0%";
+      if (stepLabel) {
+        const dateStr = state.appointment.date.fullFormatted || state.appointment.date.dow || "Upcoming";
+        stepLabel.textContent = `📅 Scheduled: ${dateStr} at ${state.appointment.time} (Awaiting Drop-off)`;
+      }
+      if (estFinish) {
+        estFinish.textContent = `Arrival: ${state.appointment.time}`;
+      }
+    } else {
+      const steps = getServiceSteps(state.progress.stepIndex);
+      if (fill && stepLabel) {
+        const pct = Math.round(((state.progress.stepIndex + 1) / steps.length) * 100);
+        fill.style.width = pct + "%";
+        stepLabel.textContent = `Step ${state.progress.stepIndex + 1} of ${steps.length}: ${steps[state.progress.stepIndex].title}`;
+      }
+      if (estFinish && window.GeoTime) {
+        estFinish.textContent = window.GeoTime.getDynamicETA(state.progress.stepIndex);
+      }
     }
   }
 
@@ -387,67 +407,143 @@
       tzBadge.textContent = `Timezone: ${geo.city} (${geo.abbreviation})`;
     }
 
-    // Dates (Next 6 days dynamically generated from user's local calendar)
+    // Dates (Next 7 days dynamically generated from user's local calendar)
     const dateContainer = document.getElementById("book-date-row");
     if (dateContainer) {
-      const dates = (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(6) : [];
-      if (!dates.length) {
-        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const now = new Date();
-        for (let i = 0; i < 6; i++) {
-          const d = new Date(now);
-          d.setDate(now.getDate() + i);
-          dates.push({
-            dow: days[d.getDay()],
-            num: d.getDate(),
-            month: d.toLocaleString('default', { month: 'short' }),
-            isToday: i === 0
-          });
+      const dates = (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(7) : [];
+      
+      // If current booking date is missing or closed, select first open day
+      if (!state.booking.date || state.booking.date.isClosed) {
+        const firstOpen = dates.find(d => !d.isClosed) || dates[0];
+        if (firstOpen) {
+          state.booking.date = firstOpen;
         }
       }
 
       dateContainer.innerHTML = dates.map((d, idx) => {
-        const isSel = d.num === state.booking.date.num;
+        const isSel = state.booking.date && (d.num === state.booking.date.num && d.month === state.booking.date.month);
+        const closedStyle = d.isClosed ? 'style="opacity:0.45; cursor:not-allowed;" title="Closed on Sundays"' : '';
         return `
-          <div class="date-pill-btn ${isSel ? 'selected' : ''}" data-idx="${idx}">
+          <div class="date-pill-btn ${isSel ? 'selected' : ''}" data-idx="${idx}" ${closedStyle}>
             <span style="font-size:11px; text-transform:uppercase;">${d.isToday ? 'Today' : d.dow}</span>
             <span class="font-mono" style="font-size:18px; font-weight:700;">${d.num}</span>
-            <span style="font-size:10px; opacity:0.8;">${d.month}</span>
+            <span style="font-size:10px; opacity:0.8;">${d.isClosed ? 'Closed' : d.month}</span>
           </div>
         `;
       }).join("");
 
       dateContainer.querySelectorAll(".date-pill-btn").forEach((el, idx) => {
         el.addEventListener("click", () => {
-          state.booking.date = dates[idx];
+          const selectedDay = dates[idx];
+          if (selectedDay.isClosed) {
+            showToast("Habesha Auto is closed on Sundays. Please choose Monday through Saturday.", "warning");
+            return;
+          }
+          state.booking.date = selectedDay;
+          const validSlots = selectedDay.slots && selectedDay.slots.length ? selectedDay.slots : ["8:00 AM", "10:00 AM", "1:00 PM", "3:00 PM"];
+          if (!validSlots.includes(state.booking.time)) {
+            state.booking.time = validSlots[0] || "8:00 AM";
+          }
           renderBooking();
         });
       });
     }
 
-    // Time Slots
-    const timeSlots = ["8:30 AM", "10:00 AM", "11:30 AM", "1:00 PM", "2:30 PM", "4:00 PM"];
+    // Time Slots for the selected date
     const timeContainer = document.getElementById("book-time-grid");
     if (timeContainer) {
-      timeContainer.innerHTML = timeSlots.map(t => `
-        <div class="time-slot-btn ${t === state.booking.time ? 'selected' : ''}" data-time="${t}">
-          ${t}
-        </div>
-      `).join("");
+      const activeSlots = (state.booking.date && state.booking.date.slots) 
+        ? state.booking.date.slots 
+        : (window.GeoTime ? window.GeoTime.getTimeSlotsForDay(state.booking.date ? state.booking.date.dayOfWeek : 1) : ["8:00 AM", "10:00 AM", "1:00 PM", "3:00 PM"]);
 
-      timeContainer.querySelectorAll(".time-slot-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          state.booking.time = btn.getAttribute("data-time");
-          renderBooking();
+      if (!activeSlots || activeSlots.length === 0) {
+        timeContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; padding:16px; text-align:center; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; color:#fca5a5;">
+            ⚠️ Facility is closed on this day. Please choose a Monday through Saturday slot.
+          </div>
+        `;
+      } else {
+        timeContainer.innerHTML = activeSlots.map(t => `
+          <div class="time-slot-btn ${t === state.booking.time ? 'selected' : ''}" data-time="${t}">
+            ${t}
+          </div>
+        `).join("");
+
+        timeContainer.querySelectorAll(".time-slot-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            state.booking.time = btn.getAttribute("data-time");
+            renderBooking();
+          });
         });
-      });
+      }
     }
   }
 
   // ==========================================
-  // RENDER: LIVE BAY PROGRESS
+  // RENDER: LIVE BAY PROGRESS & SCHEDULED TICKET
   // ==========================================
   function renderProgress() {
+    const schedView = document.getElementById("progress-scheduled-view");
+    const liveView = document.getElementById("progress-live-view");
+    const backToSchedBtn = document.getElementById("btn-back-to-scheduled");
+
+    const appt = state.appointment;
+    const isScheduledMode = appt && appt.status === "scheduled" && !state.liveDemoMode;
+
+    if (schedView && liveView) {
+      if (isScheduledMode) {
+        schedView.style.display = "block";
+        liveView.style.display = "none";
+
+        // Fill in Scheduled ticket
+        const dateFormatted = (appt.date && (appt.date.fullFormatted || appt.date.dow)) || "Scheduled Date";
+        const titleEl = document.getElementById("sched-header-title");
+        const refEl = document.getElementById("sched-ref-code");
+        const vehEl = document.getElementById("sched-veh-name");
+        const dtEl = document.getElementById("sched-datetime");
+        const mobEl = document.getElementById("sched-mobility-label");
+        const costEl = document.getElementById("sched-total-cost");
+
+        if (titleEl) titleEl.textContent = `Service Scheduled for ${dateFormatted} at ${appt.time}`;
+        if (refEl) refEl.textContent = appt.id || "APT-829104";
+        if (vehEl) vehEl.textContent = appt.vehicle ? (appt.vehicle.title + " (VIN: " + appt.vehicle.vin + ")") : "2021 Honda Accord EX-L";
+        if (dtEl) dtEl.textContent = `${dateFormatted} • ${appt.time}`;
+        
+        const mobilityLabels = {
+          wait: "Wait in Customer Lounge (Business Hours)",
+          keydrop: "Secure Key Drop Box (During Business Hours Only)",
+          shuttle: "Complimentary Lyft Voucher ($20 Credit)"
+        };
+        if (mobEl) mobEl.textContent = mobilityLabels[appt.mobility] || "Customer Drop-off";
+        if (costEl) costEl.textContent = `$${(appt.total || calculateBookingTotal()).toFixed(2)}`;
+
+        const svcContainer = document.getElementById("sched-services-list");
+        if (svcContainer) {
+          const svcs = (appt.services || state.booking.selectedServices).map(id => SERVICES.find(s => s.id === id)).filter(Boolean);
+          if (!svcs.length) {
+            svcContainer.innerHTML = `<div style="font-size:12px; color:var(--text-muted);">Standard Multi-Point Inspection</div>`;
+          } else {
+            svcContainer.innerHTML = svcs.map(s => `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; background:var(--bg-card); border-radius:6px; border:1px solid var(--border-subtle);">
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#fff;">${s.name}</div>
+                  <div style="font-size:11px; color:var(--text-muted);">${s.duration} • ${s.category}</div>
+                </div>
+                <div class="font-mono" style="font-weight:700; font-size:13.5px; color:var(--accent);">$${s.price.toFixed(2)}</div>
+              </div>
+            `).join("");
+          }
+        }
+        return;
+      } else {
+        schedView.style.display = "none";
+        liveView.style.display = "block";
+        if (backToSchedBtn) {
+          backToSchedBtn.style.display = (appt && appt.status === "scheduled") ? "inline-flex" : "none";
+        }
+      }
+    }
+
     const container = document.getElementById("progress-timeline-container");
     if (!container) return;
 
@@ -478,7 +574,7 @@
       `;
     }).join("");
 
-    const base = calculateBookingTotal();
+    const base = calculateBookingTotal() || (appt ? appt.total : 89.00);
     const extra = state.progress.findingApproved ? state.progress.findingPrice : 0;
     const finalTotal = base + extra;
     document.getElementById("prog-total-display").textContent = `$${finalTotal.toFixed(2)}`;
@@ -731,6 +827,17 @@
       });
     }
 
+    function updateNavBayBadge() {
+      const badgeText = document.getElementById("nav-bay-status-text");
+      if (!badgeText) return;
+      if (state.appointment && state.appointment.status === "scheduled" && !state.liveDemoMode) {
+        const dStr = state.appointment.date.dow || "Scheduled";
+        badgeText.textContent = `📅 ${dStr} ${state.appointment.time}`;
+      } else {
+        badgeText.textContent = "Bay 3 Active";
+      }
+    }
+
     // Confirm Booking CTA
     const confirmBookingBtn = document.getElementById("confirm-booking-btn");
     if (confirmBookingBtn) {
@@ -739,20 +846,74 @@
           showToast("Please select at least one service to book.", "warning");
           return;
         }
-        showToast("Appointment confirmed! Your bay has been allocated.", "success");
+        if (state.booking.date && state.booking.date.isClosed) {
+          showToast("Habesha Auto is closed on Sundays. Please select a Monday through Saturday appointment.", "warning");
+          return;
+        }
+
+        const isToday = Boolean(state.booking.date && state.booking.date.isToday);
+        const shop = window.GeoTime ? window.GeoTime.isShopOpen() : { isOpen: true };
+        const isLiveNow = isToday && shop.isOpen;
+
+        const appt = {
+          id: "APT-" + Math.floor(100000 + Math.random() * 900000),
+          vehicle: state.vehicles[state.activeVehicleIndex] || state.vehicles[0],
+          services: [...state.booking.selectedServices],
+          date: state.booking.date,
+          time: state.booking.time,
+          mobility: document.querySelector('input[name="mobility_opt"]:checked')?.value || "wait",
+          total: calculateBookingTotal(),
+          status: isLiveNow ? "in-progress" : "scheduled",
+          createdAt: new Date().toISOString()
+        };
+
+        state.appointment = appt;
+        state.liveDemoMode = false;
+        try {
+          localStorage.setItem("habesha_active_appt", JSON.stringify(appt));
+        } catch (e) {}
+
+        const dateLabel = state.booking.date.fullFormatted || state.booking.date.dow || "Selected Date";
+        showToast(`Appointment confirmed for ${dateLabel} at ${state.booking.time}!`, "success");
         state.progress.stepIndex = 0;
+
         if (state.isAuthenticated && typeof api !== "undefined") {
           api.put("/appointments/current", {
             serviceIdxs: state.booking.selectedServices,
             day: state.booking.date,
             time: state.booking.time,
-            stepIndex: 0,
-            status: "in-progress",
-            statusLabel: "Bay 3 Active",
+            stepIndex: isLiveNow ? 0 : -1,
+            status: appt.status,
+            statusLabel: isLiveNow ? "Bay 3 Active" : "Scheduled",
             basePrice: calculateBookingTotal()
           });
         }
+
+        updateNavBayBadge();
+        renderProgress();
+        renderHome();
         navigateTo("progress");
+      });
+    }
+
+    // Toggle live workshop demo simulation from scheduled ticket
+    const schedDemoBtn = document.getElementById("sched-demo-btn");
+    if (schedDemoBtn) {
+      schedDemoBtn.addEventListener("click", () => {
+        state.liveDemoMode = true;
+        updateNavBayBadge();
+        renderProgress();
+        showToast("Switched to Live Workshop Simulation Demo Mode.", "info");
+      });
+    }
+
+    const backToSchedBtn = document.getElementById("btn-back-to-scheduled");
+    if (backToSchedBtn) {
+      backToSchedBtn.addEventListener("click", () => {
+        state.liveDemoMode = false;
+        updateNavBayBadge();
+        renderProgress();
+        showToast("Returned to Scheduled Appointment Ticket.", "info");
       });
     }
 
@@ -1489,6 +1650,11 @@
       state.messages = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
       state.progress.stepIndex = 2;
       state.booking.selectedServices = [];
+      state.appointment = null;
+      state.liveDemoMode = false;
+      try {
+        localStorage.removeItem("habesha_active_appt");
+      } catch (e) {}
 
       updateAuthUI();
       renderHome();
@@ -1626,6 +1792,13 @@
     }
 
     initEventListeners();
+    if (state.appointment && state.appointment.status === "scheduled" && !state.liveDemoMode) {
+      const badgeText = document.getElementById("nav-bay-status-text");
+      if (badgeText) {
+        const dStr = state.appointment.date.dow || "Scheduled";
+        badgeText.textContent = `📅 ${dStr} ${state.appointment.time}`;
+      }
+    }
     navigateTo("home");
   });
 

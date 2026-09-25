@@ -82,4 +82,38 @@ describe('GeoTime Engine (client/js/geo-time.js)', () => {
     expect(days[0]).toHaveProperty('num');
     expect(days[0]).toHaveProperty('month');
   });
+
+  test('enforces official business hours schedule and slots', () => {
+    expect(GeoTime.BUSINESS_HOURS).toBeDefined();
+    // Monday (1) to Friday (5): 8:00 AM - 5:00 PM
+    for (let day = 1; day <= 5; day++) {
+      const sched = GeoTime.BUSINESS_HOURS.schedule[day];
+      expect(sched.openHour).toBe(8);
+      expect(sched.closeHour).toBe(17);
+      expect(sched.label).toBe('8:00 AM – 5:00 PM');
+      const slots = GeoTime.getTimeSlotsForDay(day);
+      expect(slots.length).toBeGreaterThan(0);
+      expect(slots[0]).toBe('8:00 AM');
+    }
+
+    // Saturday (6): 9:00 AM - 3:00 PM
+    const satSched = GeoTime.BUSINESS_HOURS.schedule[6];
+    expect(satSched.openHour).toBe(9);
+    expect(satSched.closeHour).toBe(15);
+    expect(satSched.label).toBe('9:00 AM – 3:00 PM');
+    const satSlots = GeoTime.getTimeSlotsForDay(6);
+    expect(satSlots.length).toBeGreaterThan(0);
+    expect(satSlots[0]).toBe('9:00 AM');
+
+    // Sunday (0): Closed
+    const sunSched = GeoTime.BUSINESS_HOURS.schedule[0];
+    expect(sunSched.isClosed).toBe(true);
+    const sunSlots = GeoTime.getTimeSlotsForDay(0);
+    expect(sunSlots).toEqual([]);
+  });
+
+  test('contains clear key drop box liability policy', () => {
+    expect(GeoTime.BUSINESS_HOURS.keyDropPolicy).toContain('business hours');
+    expect(GeoTime.BUSINESS_HOURS.keyDropPolicy).toContain('NO responsibility or liability');
+  });
 });

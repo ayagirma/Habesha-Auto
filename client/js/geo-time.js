@@ -1,11 +1,29 @@
 /**
- * TORQUE & CO — GEOLOCATION & DYNAMIC TIME ENGINE
+ * TORQUE & CO / HABESHA AUTO — GEOLOCATION & DYNAMIC TIME ENGINE
  * Resolves browser/device geographic timezone, locale, and calculates dynamic local timestamps,
- * appointment scheduling calendars, and live shop workflow ETAs.
+ * business hours, appointment scheduling calendars, and live shop workflow ETAs.
  */
 
 (function (window) {
   "use strict";
+
+  // Official Business Operating Hours
+  // Monday - Friday: 8:00 AM - 5:00 PM
+  // Saturday: 9:00 AM - 3:00 PM
+  // Sunday: Closed
+  const BUSINESS_HOURS = {
+    schedule: {
+      1: { name: "Monday", openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0, label: "8:00 AM – 5:00 PM" },
+      2: { name: "Tuesday", openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0, label: "8:00 AM – 5:00 PM" },
+      3: { name: "Wednesday", openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0, label: "8:00 AM – 5:00 PM" },
+      4: { name: "Thursday", openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0, label: "8:00 AM – 5:00 PM" },
+      5: { name: "Friday", openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0, label: "8:00 AM – 5:00 PM" },
+      6: { name: "Saturday", openHour: 9, openMinute: 0, closeHour: 15, closeMinute: 0, label: "9:00 AM – 3:00 PM" },
+      0: { name: "Sunday", isClosed: true, label: "Closed" }
+    },
+    summaryText: "Mon–Fri: 8:00 AM – 5:00 PM | Sat: 9:00 AM – 3:00 PM | Sun: Closed",
+    keyDropPolicy: "Key Drop Box is ONLY accessible & permitted during business hours (Mon–Fri 8:00 AM–5:00 PM, Sat 9:00 AM–3:00 PM). Habesha Auto assumes NO responsibility or liability for keys or vehicles left outside business hours, in any neighborhood area, or outside the facility fence."
+  };
 
   // Cache resolved timezone & locale
   let detectedInfo = null;
@@ -14,15 +32,17 @@
     if (detectedInfo) return detectedInfo;
 
     let timeZone = "America/Denver"; // sensible default fallback
-    let locale = navigator.language || "en-US";
+    let locale = (typeof navigator !== "undefined" && navigator.language) ? navigator.language : "en-US";
 
     try {
-      timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Denver";
+      if (typeof Intl !== "undefined" && Intl.DateTimeFormat) {
+        timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Denver";
+      }
     } catch (e) {
       console.warn("Timezone resolution fallback to default:", e);
     }
 
-    // Extract City / Region from IANA string (e.g. "America/Denver" -> "Denver", "Europe/London" -> "London")
+    // Extract City / Region from IANA string
     const parts = timeZone.split("/");
     const cityRaw = parts[parts.length - 1] || timeZone;
     const city = cityRaw.replace(/_/g, " ");
@@ -36,7 +56,6 @@
         abbreviation = tzPart.value;
       }
     } catch (e) {
-      // Fallback: calculate UTC offset
       const offsetMinutes = -new Date().getTimezoneOffset();
       const sign = offsetMinutes >= 0 ? "+" : "-";
       const hrs = Math.floor(Math.abs(offsetMinutes) / 60);
@@ -97,11 +116,72 @@
     return formatTime(getRelativeDate(minutesOffset, baseDate));
   }
 
+  // Determine if the repair shop is currently open based on business operating hours
+  function isShopOpen(baseDate = new Date()) {
+    const geo = detectGeoTimezone();
+    const d = (baseDate instanceof Date) ? baseDate : new Date(baseDate);
+
+    let dayOfWeek = d.getDay();
+    let currentHour = d.getHours();
+    let currentMin = d.getMinutes();
+
+    try {
+      const hourFormatter = new Intl.DateTimeFormat(geo.locale, { hour: "numeric", hour12: false, timeZone: geo.timeZone });
+      const minFormatter = new Intl.DateTimeFormat(geo.locale, { minute: "numeric", timeZone: geo.timeZone });
+      currentHour = parseInt(hourFormatter.format(d), 10);
+      currentMin = parseInt(minFormatter.format(d), 10);
+    } catch (e) {
+      // fallback
+    }
+
+    const currentMinutesOfDay = currentHour * 60 + currentMin;
+    const sched = BUSINESS_HOURS.schedule[dayOfWeek];
+
+    if (!sched || sched.isClosed) {
+      return {
+        isOpen: false,
+        statusText: "Closed",
+        badgeClass: "pill-warning",
+        label: "Closed (Sundays)",
+        hoursText: sched ? sched.label : "Closed",
+        schedule: BUSINESS_HOURS.schedule,
+        summary: BUSINESS_HOURS.summaryText,
+        keyDropPolicy: BUSINESS_HOURS.keyDropPolicy
+      };
+    }
+
+    const openMinOfDay = sched.openHour * 60 + sched.openMinute;
+    const closeMinOfDay = sched.closeHour * 60 + sched.closeMinute;
+    const isOpen = currentMinutesOfDay >= openMinOfDay && currentMinutesOfDay < closeMinOfDay;
+
+    return {
+      isOpen,
+      statusText: isOpen ? "Open Now" : "Closed Now",
+      badgeClass: isOpen ? "pill-good" : "pill-warning",
+      label: isOpen ? `Open Today (${sched.label})` : `Closed Now (Hours: ${sched.label})`,
+      hoursText: sched.label,
+      schedule: BUSINESS_HOURS.schedule,
+      summary: BUSINESS_HOURS.summaryText,
+      keyDropPolicy: BUSINESS_HOURS.keyDropPolicy
+    };
+  }
+
+  // Time slots per day of week according to business operating hours
+  function getTimeSlotsForDay(dayOfWeek) {
+    if (dayOfWeek === 0) {
+      // Sunday - Closed
+      return [];
+    }
+    if (dayOfWeek === 6) {
+      // Saturday - 9:00 AM to 3:00 PM
+      return ["9:00 AM", "10:30 AM", "12:00 PM", "1:30 PM", "2:30 PM"];
+    }
+    // Monday - Friday: 8:00 AM to 5:00 PM
+    return ["8:00 AM", "9:30 AM", "11:00 AM", "12:30 PM", "2:00 PM", "3:30 PM", "4:30 PM"];
+  }
+
   // Dynamically calculate the 5 workflow steps relative to current time and step index
   function getWorkflowSteps(currentStepIndex = 2, baseDate = new Date()) {
-    // Minute offsets relative to current time for each step (0 to 4)
-    // If stepIndex is 2 (middle):
-    // step 0 completed ~45m ago, step 1 completed ~25m ago, step 2 active ~5m ago, step 3 est in 15m, step 4 est in 35m
     const stepOffsetsByCurrent = {
       0: [-5, 15, 35, 55, 75],
       1: [-25, -5, 20, 40, 60],
@@ -154,7 +234,7 @@
   }
 
   // Generate real calendar days for online booking starting today in viewer's timezone
-  function getBookingDays(count = 6) {
+  function getBookingDays(count = 7) {
     const geo = detectGeoTimezone();
     const days = [];
     const now = new Date();
@@ -167,13 +247,20 @@
       const monthShort = new Intl.DateTimeFormat(geo.locale, { month: "short", timeZone: geo.timeZone }).format(d);
       const dayNum = parseInt(new Intl.DateTimeFormat(geo.locale, { day: "numeric", timeZone: geo.timeZone }).format(d), 10);
       const year = d.getFullYear();
+      const dayOfWeek = d.getDay();
+      const sched = BUSINESS_HOURS.schedule[dayOfWeek];
+      const isClosed = Boolean(sched && sched.isClosed);
 
       days.push({
         dow: dowShort,
         num: dayNum,
         month: monthShort,
         year: year,
+        dayOfWeek: dayOfWeek,
         isToday: i === 0,
+        isClosed: isClosed,
+        hoursLabel: sched ? sched.label : "Closed",
+        slots: getTimeSlotsForDay(dayOfWeek),
         fullFormatted: `${dowShort}, ${monthShort} ${dayNum}`
       });
     }
@@ -200,6 +287,7 @@
     const updateClock = () => {
       const now = new Date();
       const geo = detectGeoTimezone();
+      const shopStatus = isShopOpen(now);
 
       const timeStr = formatTime(now, {
         hour: "numeric",
@@ -215,15 +303,14 @@
       });
 
       if (options.renderCustom) {
-        options.renderCustom(el, { timeStr, dateStr, geo, now });
+        options.renderCustom(el, { timeStr, dateStr, geo, shopStatus, now });
         return;
       }
 
-      // Default high-precision display: "11:42:08 AM MDT • Denver • Thu, Sep 24"
       if (options.compact) {
         el.innerHTML = `<span style="color:#fff; font-weight:700;">${timeStr}</span> <span style="opacity:0.75;">${geo.abbreviation}</span>`;
       } else {
-        el.innerHTML = `<span style="color:#fff; font-weight:700;">${timeStr} ${geo.abbreviation}</span> &bull; <span style="color:var(--text-secondary);">${geo.city}</span> &bull; <span style="opacity:0.8;">${dateStr}</span>`;
+        el.innerHTML = `<span style="color:#fff; font-weight:700;">${timeStr} ${geo.abbreviation}</span> &bull; <span style="color:var(--text-secondary);">${geo.city}</span> &bull; <span style="opacity:0.8;">${dateStr}</span> &bull; <span class="pill ${shopStatus.badgeClass}" style="font-size:10.5px; padding:2px 8px;">${shopStatus.statusText}</span>`;
       }
     };
 
@@ -242,6 +329,9 @@
     getWorkflowSteps,
     getDynamicETA,
     getBookingDays,
+    getTimeSlotsForDay,
+    isShopOpen,
+    BUSINESS_HOURS,
     bindLiveClock
   };
 

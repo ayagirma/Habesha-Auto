@@ -124,8 +124,8 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </div>
               <div>
-                <h3 style="font-size:15px; font-weight:700;">3 Master Technician Bays Open Today</h3>
-                <p style="font-size:12.5px; color:var(--text-secondary);">Real-time video inspection &bull; Transparent upfront quotes &bull; 24/7 Key Locker drop-off available.</p>
+                <h3 style="font-size:15px; font-weight:700;">Precision Service Bays &bull; Official Business Hours</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary);">Mon–Fri: 8:00 AM – 5:00 PM &bull; Sat: 9:00 AM – 3:00 PM &bull; Sun: Closed &bull; Key Drop during business hours only.</p>
               </div>
             </div>
             <button class="btn btn-primary btn-sm" data-nav="book">Book Today</button>
@@ -481,18 +481,32 @@
               <label class="card" style="display:flex; flex-direction:column; gap:6px; cursor:pointer; background:var(--bg-input);">
                 <input type="radio" name="mobility_opt" value="wait" checked>
                 <strong style="font-size:13.5px; color:#fff;">Wait in Lounge</strong>
-                <span style="font-size:11.5px; color:var(--text-secondary);">High-speed WiFi, espresso bar, quiet workspaces.</span>
+                <span style="font-size:11.5px; color:var(--text-secondary);">High-speed WiFi, espresso bar, quiet workspaces during business hours.</span>
               </label>
-              <label class="card" style="display:flex; flex-direction:column; gap:6px; cursor:pointer; background:var(--bg-input);">
+              <label class="card" style="display:flex; flex-direction:column; gap:6px; cursor:pointer; background:var(--bg-input); border:1px solid var(--accent-soft);">
                 <input type="radio" name="mobility_opt" value="keydrop">
-                <strong style="font-size:13.5px; color:#fff;">24/7 Key Drop</strong>
-                <span style="font-size:11.5px; color:var(--text-secondary);">Instant QR code &amp; electronic locker PIN for after-hours drop.</span>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <strong style="font-size:13.5px; color:#fff;">Key Drop Box</strong>
+                  <span class="pill pill-accent" style="font-size:9.5px; padding:2px 6px;">Business Hours Only</span>
+                </div>
+                <span style="font-size:11.5px; color:var(--text-secondary);">Drop keys into our secure on-site drop box during shop operating hours.</span>
               </label>
               <label class="card" style="display:flex; flex-direction:column; gap:6px; cursor:pointer; background:var(--bg-input);">
                 <input type="radio" name="mobility_opt" value="shuttle">
                 <strong style="font-size:13.5px; color:#fff;">Complimentary Lyft</strong>
                 <span style="font-size:11.5px; color:var(--text-secondary);">Free $20 voucher code texted for rides to work or home.</span>
               </label>
+            </div>
+
+            <!-- Key Drop & Facility Liability Disclaimer -->
+            <div style="margin-top:14px; padding:12px 14px; background:rgba(239,68,68,0.08); border-left:3px solid #ef4444; border-radius:6px; font-size:12px; line-height:1.5; color:#fca5a5;">
+              <div style="font-weight:700; color:#ef4444; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                <span>⚠️</span> Important Key Drop &amp; Facility Policy:
+              </div>
+              <div>
+                Keys may <strong>ONLY</strong> be deposited into the key drop box <strong>during official business hours</strong> (Mon–Fri 8:00 AM – 5:00 PM, Sat 9:00 AM – 3:00 PM; Sunday Closed).
+                <strong>Habesha Auto accepts NO responsibility or liability</strong> for any keys, belongings, or vehicles left outside of business hours, in surrounding neighborhood areas, on public streets, or outside the facility fence.
+              </div>
             </div>
           </div>
 
@@ -523,87 +537,181 @@
           </div>
         </div>
 
-        <div class="grid-cockpit">
-          <!-- Left: Bay Feed & Assigned Tech Card -->
-          <div style="display:flex; flex-direction:column; gap:20px;">
-            <div class="live-bay-card">
-              <!-- Live Video Feed Simulation -->
-              <div class="bay-cam-viewport">
-                <div class="live-rec-pill">
-                  <span class="rec-dot"></span>
-                  LIVE BAY 3
-                </div>
-                <!-- Simulated Industrial Bay View SVG -->
-                <svg viewBox="0 0 400 220" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style="opacity:0.85;">
-                  <!-- Workshop background -->
-                  <rect width="400" height="220" fill="#0A0D13"/>
-                  <line x1="0" y1="180" x2="400" y2="180" stroke="#1E2430" stroke-width="4"/>
-                  <!-- Hydraulic Lift Columns -->
-                  <rect x="60" y="20" width="20" height="160" fill="#1C222E"/>
-                  <rect x="320" y="20" width="20" height="160" fill="#1C222E"/>
-                  <!-- Lift Arms -->
-                  <rect x="70" y="100" width="120" height="10" fill="#FF5A1F"/>
-                  <rect x="210" y="100" width="120" height="10" fill="#FF5A1F"/>
-                  <!-- Vehicle Silhouette on lift -->
-                  <path d="M100 100 L120 70 L280 70 L300 100 L310 100 L310 115 L90 115 L90 100 Z" fill="#2E3748"/>
-                  <circle cx="130" cy="115" r="16" fill="#0A0D13" stroke="#475569" stroke-width="3"/>
-                  <circle cx="270" cy="115" r="16" fill="#0A0D13" stroke="#475569" stroke-width="3"/>
-                  <!-- Mechanic Avatar working -->
-                  <circle cx="200" cy="130" r="10" fill="#FF946B"/>
-                  <rect x="190" y="142" width="20" height="35" rx="4" fill="#1E293B"/>
-                  <!-- Laser Scan Beam -->
-                  <line x1="0" y1="85" x2="400" y2="85" stroke="rgba(255,90,31,0.4)" stroke-width="1.5" stroke-dasharray="6"/>
-                </svg>
+        <!-- Scheduled Appointment & Drop-Off Confirmation View -->
+        <div id="progress-scheduled-view" style="display:none;">
+          <div class="card card-elevated" style="margin-bottom:20px; border-left:4px solid var(--accent); background:linear-gradient(135deg, rgba(255,90,31,0.08) 0%, rgba(18,21,27,0.95) 100%);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+              <div>
+                <span class="pill pill-accent" id="sched-status-pill">📅 Appointment Confirmed</span>
+                <h2 style="font-size:22px; font-weight:700; margin-top:8px;" id="sched-header-title">Service Scheduled for Tomorrow at 10:00 AM</h2>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;" id="sched-header-sub">Bay 3 has been allocated. Real-time technician live video &amp; step telemetry activate upon vehicle check-in.</p>
               </div>
-
-              <!-- Assigned Tech Info -->
-              <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--bg-input); border-radius:var(--radius-md);">
-                <div style="display:flex; align-items:center; gap:12px;">
-                  <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#FF5A1F,#992600); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff;">
-                    MV
-                  </div>
-                  <div>
-                    <div style="font-weight:700; font-size:14.5px;">Marcus Vance</div>
-                    <div style="font-size:11.5px; color:var(--text-muted);">ASE Master Certified &bull; 14 Yrs Exp</div>
-                  </div>
-                </div>
-                <button class="btn btn-dark btn-sm" data-nav="messages">Message Tech</button>
-              </div>
-            </div>
-
-            <!-- Simulation Controls for Pair Programming Demo -->
-            <div class="card" style="border-style:dashed; border-color:var(--border-bright);">
-              <span class="eyebrow">Interactive Demo Controller</span>
-              <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
-                Simulate shop technician actions in real-time:
-              </p>
-              <div style="display:flex; gap:8px;">
-                <button class="btn btn-primary btn-sm btn-full" id="sim-advance-step-btn">Advance Next Step</button>
-                <button class="btn btn-outline btn-sm btn-full" id="sim-trigger-finding-btn" style="border-color:var(--warning); color:var(--warning);">Simulate Finding Issue</button>
-              </div>
+              <button class="btn btn-outline btn-sm" id="sched-demo-btn" style="border-color:var(--accent); color:var(--accent);">
+                🔧 Preview Live Bay Tracking Demo
+              </button>
             </div>
           </div>
 
-          <!-- Right: Live Step Progression Checklist -->
-          <div class="card card-elevated">
-            <div class="section-header">
-              <div>
-                <span class="eyebrow">Step Progression</span>
-                <h3 style="font-size:18px;">Service Workflow Timeline</h3>
+          <div class="grid-2col">
+            <!-- Left: Appointment Details -->
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="section-header" style="margin-bottom:0;">
+                <span class="eyebrow">Reserved Appointment Details</span>
+                <span class="font-mono" style="font-size:12px; color:var(--accent);" id="sched-ref-code">APT-829104</span>
               </div>
-              <span class="pill pill-good" id="prog-overall-badge">In Progress (60%)</span>
+
+              <div style="display:flex; flex-direction:column; gap:12px; padding:14px; background:var(--bg-input); border-radius:8px;">
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                  <span style="color:var(--text-secondary);">Vehicle:</span>
+                  <strong style="color:#fff;" id="sched-veh-name">2021 Honda Accord EX-L</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                  <span style="color:var(--text-secondary);">Date &amp; Time:</span>
+                  <strong class="font-mono" style="color:var(--accent);" id="sched-datetime">Tomorrow, Sep 25 &bull; 10:00 AM</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                  <span style="color:var(--text-secondary);">Assigned Bay:</span>
+                  <strong style="color:#fff;">Bay 3 (Lead Tech: Marcus Vance)</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px;">
+                  <span style="color:var(--text-secondary);">Mobility Option:</span>
+                  <strong style="color:#fff;" id="sched-mobility-label">Key Drop Box (Business Hours)</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; padding-top:8px; border-top:1px solid var(--border-subtle);">
+                  <span style="color:var(--text-secondary);">Estimated Total:</span>
+                  <strong class="font-mono" style="font-size:16px; color:#fff;" id="sched-total-cost">$89.00</strong>
+                </div>
+              </div>
+
+              <div>
+                <div style="font-size:12.5px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Selected Services:</div>
+                <div id="sched-services-list" style="display:flex; flex-direction:column; gap:8px;">
+                  <!-- Dynamic Service list -->
+                </div>
+              </div>
             </div>
 
-            <div class="timeline-steps" id="progress-timeline-container">
-              <!-- Dynamically Populated by JS -->
+            <!-- Right: Check-in & Key Drop Guidelines -->
+            <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+              <span class="eyebrow">Vehicle Drop-Off &amp; Key Box Policy</span>
+
+              <div style="padding:14px; background:var(--bg-input); border-radius:8px; display:flex; flex-direction:column; gap:10px;">
+                <div style="font-weight:700; font-size:13.5px; color:#fff;">Drop-Off Guidelines:</div>
+                <ul style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-left:16px;">
+                  <li>Please arrive or deposit keys 10–15 minutes prior to your time window.</li>
+                  <li>Our service advisor will perform an exterior check-in walkaround.</li>
+                  <li>You will receive live SMS and in-app notifications as Marcus Vance advances each stage.</li>
+                </ul>
+              </div>
+
+              <!-- Liability Policy Box -->
+              <div style="padding:14px; background:rgba(239,68,68,0.08); border-left:3px solid #ef4444; border-radius:6px; font-size:12px; line-height:1.5; color:#fca5a5;">
+                <div style="font-weight:700; color:#ef4444; margin-bottom:4px;">⚠️ Official Key Drop &amp; Liability Notice:</div>
+                <div>
+                  Keys can <strong>ONLY</strong> be deposited into our on-site drop box <strong>during business hours</strong> (Mon–Fri 8:00 AM – 5:00 PM, Sat 9:00 AM – 3:00 PM; Closed Sundays).
+                  <br><br>
+                  <strong>Habesha Auto accepts NO responsibility or liability</strong> for keys or vehicles left outside business hours, in neighborhood streets, or outside the facility fence.
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:auto;">
+                <button class="btn btn-outline btn-sm btn-full" data-nav="book">Modify Booking</button>
+                <button class="btn btn-primary btn-sm btn-full" data-nav="home">Return to Garage Hub</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Bay Cockpit View (Active During Live Service or Demo) -->
+        <div id="progress-live-view">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+            <button class="btn btn-ghost btn-sm" id="btn-back-to-scheduled" style="display:none; font-size:12px;">
+              &larr; Return to Scheduled Appointment Ticket
+            </button>
+          </div>
+
+          <div class="grid-cockpit">
+            <!-- Left: Bay Feed & Assigned Tech Card -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+              <div class="live-bay-card">
+                <!-- Live Video Feed Simulation -->
+                <div class="bay-cam-viewport">
+                  <div class="live-rec-pill">
+                    <span class="rec-dot"></span>
+                    LIVE BAY 3
+                  </div>
+                  <!-- Simulated Industrial Bay View SVG -->
+                  <svg viewBox="0 0 400 220" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style="opacity:0.85;">
+                    <!-- Workshop background -->
+                    <rect width="400" height="220" fill="#0A0D13"/>
+                    <line x1="0" y1="180" x2="400" y2="180" stroke="#1E2430" stroke-width="4"/>
+                    <!-- Hydraulic Lift Columns -->
+                    <rect x="60" y="20" width="20" height="160" fill="#1C222E"/>
+                    <rect x="320" y="20" width="20" height="160" fill="#1C222E"/>
+                    <!-- Lift Arms -->
+                    <rect x="70" y="100" width="120" height="10" fill="#FF5A1F"/>
+                    <rect x="210" y="100" width="120" height="10" fill="#FF5A1F"/>
+                    <!-- Vehicle Silhouette on lift -->
+                    <path d="M100 100 L120 70 L280 70 L300 100 L310 100 L310 115 L90 115 L90 100 Z" fill="#2E3748"/>
+                    <circle cx="130" cy="115" r="16" fill="#0A0D13" stroke="#475569" stroke-width="3"/>
+                    <circle cx="270" cy="115" r="16" fill="#0A0D13" stroke="#475569" stroke-width="3"/>
+                    <!-- Mechanic Avatar working -->
+                    <circle cx="200" cy="130" r="10" fill="#FF946B"/>
+                    <rect x="190" y="142" width="20" height="35" rx="4" fill="#1E293B"/>
+                    <!-- Laser Scan Beam -->
+                    <line x1="0" y1="85" x2="400" y2="85" stroke="rgba(255,90,31,0.4)" stroke-width="1.5" stroke-dasharray="6"/>
+                  </svg>
+                </div>
+
+                <!-- Assigned Tech Info -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--bg-input); border-radius:var(--radius-md);">
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#FF5A1F,#992600); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff;">
+                      MV
+                    </div>
+                    <div>
+                      <div style="font-weight:700; font-size:14.5px;">Marcus Vance</div>
+                      <div style="font-size:11.5px; color:var(--text-muted);">ASE Master Certified &bull; 14 Yrs Exp</div>
+                    </div>
+                  </div>
+                  <button class="btn btn-dark btn-sm" data-nav="messages">Message Tech</button>
+                </div>
+              </div>
+
+              <!-- Simulation Controls for Pair Programming Demo -->
+              <div class="card" style="border-style:dashed; border-color:var(--border-bright);">
+                <span class="eyebrow">Interactive Demo Controller</span>
+                <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+                  Simulate shop technician actions in real-time:
+                </p>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn btn-primary btn-sm btn-full" id="sim-advance-step-btn">Advance Next Step</button>
+                  <button class="btn btn-outline btn-sm btn-full" id="sim-trigger-finding-btn" style="border-color:var(--warning); color:var(--warning);">Simulate Finding Issue</button>
+                </div>
+              </div>
             </div>
 
-            <div style="margin-top:24px; padding-top:18px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <div style="font-size:11.5px; color:var(--text-muted);">Total Approved Work</div>
-                <div class="font-mono" style="font-size:18px; font-weight:700; color:#fff;" id="prog-total-display">$89.00</div>
+            <!-- Right: Live Step Progression Checklist -->
+            <div class="card card-elevated">
+              <div class="section-header">
+                <div>
+                  <span class="eyebrow">Step Progression</span>
+                  <h3 style="font-size:18px;">Service Workflow Timeline</h3>
+                </div>
+                <span class="pill pill-good" id="prog-overall-badge">In Progress (60%)</span>
               </div>
-              <button class="btn btn-success btn-sm" data-nav="payment" id="prog-pay-early-btn">Proceed to Payment &rarr;</button>
+
+              <div class="timeline-steps" id="progress-timeline-container">
+                <!-- Dynamically Populated by JS -->
+              </div>
+
+              <div style="margin-top:24px; padding-top:18px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-size:11.5px; color:var(--text-muted);">Total Approved Work</div>
+                  <div class="font-mono" style="font-size:18px; font-weight:700; color:#fff;" id="prog-total-display">$89.00</div>
+                </div>
+                <button class="btn btn-success btn-sm" data-nav="payment" id="prog-pay-early-btn">Proceed to Payment &rarr;</button>
+              </div>
             </div>
           </div>
         </div>
