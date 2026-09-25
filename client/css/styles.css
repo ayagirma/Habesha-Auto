@@ -1576,3 +1576,136 @@ input, select, textarea {
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
+/* ==========================================================================
+   MOBILE & TOUCH EXPERIENCE OPTIMIZATIONS
+   ========================================================================== */
+@media (max-width: 640px) {
+  :root {
+    --header-height: 58px;
+  }
+
+  .top-nav {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .brand-title {
+    font-size: 15px;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .geo-time-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .geo-time-badge .geo-tz {
+    display: none;
+  }
+
+  .nav-staff-btn {
+    display: none !important;
+  }
+
+  .bay-status-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+    gap: 5px;
+  }
+
+  .screen {
+    padding: 14px 12px 24px;
+  }
+
+  .section-header h1 {
+    font-size: 20px !important;
+  }
+
+  .section-header h2 {
+    font-size: 18px !important;
+  }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .time-slot-btn {
+    padding: 10px 6px;
+    font-size: 12.5px;
+  }
+
+  .date-selector-row {
+    gap: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .date-pill-btn {
+    flex: 0 0 64px;
+    padding: 10px 0;
+    scroll-snap-align: start;
+  }
+
+  .grid-3col {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sticky-footer {
+    padding: 12px 14px;
+  }
+
+  .sticky-footer #book-total-preview {
+    font-size: 18px !important;
+  }
+
+  .sticky-footer .btn {
+    padding: 10px 16px;
+    font-size: 13.5px;
+  }
+
+  .modal-card {
+    padding: 18px;
+    max-width: 95vw;
+    border-radius: 12px;
+  }
+
+  .mobile-bottom-nav {
+    height: 60px;
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+  }
+
+  .bottom-nav-item {
+    padding: 4px 8px;
+    font-size: 10px;
+    gap: 2px;
+  }
+
+  .toast-container {
+    bottom: 74px;
+    right: 12px;
+    left: 12px;
+  }
+
+  .toast {
+    padding: 12px 16px;
+    font-size: 12.5px;
+  }
+
+  .field-input {
+    font-size: 16px; /* Prevents auto-zoom on iOS */
+  }
+}
+
+
