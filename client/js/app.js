@@ -1856,7 +1856,7 @@
       // Step 1: Send OTP for password reset
       const forgotStep1 = document.getElementById("forgot-step1-form");
       if (forgotStep1) {
-        forgotStep1.addEventListener("submit", async (e) => {
+        forgotStep1.onsubmit = async (e) => {
           e.preventDefault();
           const email = document.getElementById("forgot-email").value.trim().toLowerCase();
           const sendBtn = document.getElementById("forgot-send-otp-btn");
@@ -1893,13 +1893,13 @@
             otpInput.value = "";
             otpInput.focus();
           }
-        });
+        };
       }
 
       // Step 2: Verify OTP & Reset Password
       const forgotStep2 = document.getElementById("forgot-step2-form");
       if (forgotStep2) {
-        forgotStep2.addEventListener("submit", async (e) => {
+        forgotStep2.onsubmit = async (e) => {
           e.preventDefault();
           const otp = document.getElementById("reset-otp-code").value.trim();
           const newPassword = document.getElementById("reset-new-password").value;
@@ -1948,11 +1948,11 @@
           const signinPass = document.getElementById("signin-password");
           if (signinEmail) signinEmail.value = currentForgotEmail;
           if (signinPass) signinPass.value = newPassword;
-        });
+        };
       }
 
       if (btnResendOtp) {
-        btnResendOtp.addEventListener("click", async () => {
+        btnResendOtp.onclick = async () => {
           if (!currentForgotEmail) return;
           btnResendOtp.disabled = true;
           btnResendOtp.textContent = "Sending...";
@@ -1964,15 +1964,15 @@
           } else {
             showAuthError(res.data?.error || "Failed to resend code.");
           }
-        });
+        };
       }
 
       // Sign In Submission
       const signinForm = document.getElementById("signin-form");
       if (signinForm) {
-        signinForm.addEventListener("submit", async (e) => {
+        signinForm.onsubmit = async (e) => {
           e.preventDefault();
-          const email = document.getElementById("signin-email").value.trim();
+          const email = document.getElementById("signin-email").value.trim().toLowerCase();
           const password = document.getElementById("signin-password").value;
           const submitBtn = document.getElementById("signin-submit-btn");
 
@@ -2024,23 +2024,33 @@
             state.activeVehicleIndex = 0;
           }
 
+          try {
+            localStorage.setItem("habesha_user_session", JSON.stringify({
+              user: state.user,
+              vehicles: state.vehicles,
+              savedAt: Date.now()
+            }));
+          } catch (e) {}
+
           closeAuthModal();
           showToast(`Welcome back, ${state.user.name}!`, "success");
-          await syncBackendData();
+          try {
+            await syncBackendData();
+          } catch (err) {}
           updateAuthUI();
           renderHome();
           renderAccount();
-        });
+        };
       }
 
       // Sign Up Submission
       const signupForm = document.getElementById("signup-form");
       if (signupForm) {
-        signupForm.addEventListener("submit", async (e) => {
+        signupForm.onsubmit = async (e) => {
           e.preventDefault();
           const name = document.getElementById("signup-name").value.trim();
           const phone = document.getElementById("signup-phone").value.trim();
-          const email = document.getElementById("signup-email").value.trim();
+          const email = document.getElementById("signup-email").value.trim().toLowerCase();
           const password = document.getElementById("signup-password").value;
           const plate = (document.getElementById("signup-plate")?.value || "").trim().toUpperCase();
           const vin = (document.getElementById("signup-vin")?.value || "").trim().toUpperCase();
@@ -2102,6 +2112,25 @@
             ];
             state.activeVehicleIndex = 0;
           }
+
+          try {
+            localStorage.setItem("habesha_user_session", JSON.stringify({
+              user: state.user,
+              vehicles: state.vehicles,
+              savedAt: Date.now()
+            }));
+          } catch (e) {}
+
+          closeAuthModal();
+          showToast(`Welcome to Habesha Auto, ${state.user.name}!`, "success");
+          try {
+            await syncBackendData();
+          } catch (err) {}
+          updateAuthUI();
+          renderHome();
+          renderAccount();
+        };
+      }
 
           closeAuthModal();
           showToast(`Welcome to Habesha Auto, ${state.user.name}!`, "success");
@@ -2352,149 +2381,6 @@
       });
     }
 
-    // Sign In Submission
-    if (signinForm) {
-      signinForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("signin-email").value.trim();
-        const password = document.getElementById("signin-password").value;
-        const submitBtn = document.getElementById("signin-submit-btn");
-
-        if (!email || !password) {
-          showAuthError("Please provide both email and password.");
-          return;
-        }
-
-        const prevText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Signing In...";
-        hideAuthError();
-
-        const res = await api.post("/auth/signin", { email, password });
-        submitBtn.disabled = false;
-        submitBtn.textContent = prevText;
-
-        if (!res.ok) {
-          showAuthError(res.data?.error || "Authentication failed. Check your email & password.");
-          return;
-        }
-
-        state.isAuthenticated = true;
-        if (res.data && res.data.user) {
-          state.user = {
-            name: res.data.user.name,
-            email: res.data.user.email,
-            phone: res.data.user.phone
-          };
-        }
-        if (res.data && res.data.vehicle) {
-          const vehTitle = `${res.data.vehicle.year || ''} ${res.data.vehicle.model || ''}`.trim() || "My Vehicle";
-          const rawVin = res.data.vehicle.vin || "";
-          const plateStr = rawVin.startsWith("PLATE:") ? rawVin.replace("PLATE:", "") : (res.data.vehicle.plate || "SAVED");
-          const displayVin = rawVin || (plateStr ? `Plate: ${plateStr}` : "Pending Bay Scan");
-
-          state.vehicles = [
-            {
-              id: "veh-main",
-              title: vehTitle,
-              vin: displayVin,
-              plate: plateStr,
-              miles: String(res.data.vehicle.miles || "0"),
-              health: "Certified Good",
-              oilLife: 85,
-              brakesMm: "6.0mm"
-            }
-          ];
-          state.activeVehicleIndex = 0;
-        }
-
-        closeAuthModal();
-        showToast(`Welcome back, ${state.user.name}!`, "success");
-        await syncBackendData();
-        updateAuthUI();
-        renderHome();
-        renderAccount();
-      });
-    }
-
-    // Sign Up Submission
-    if (signupForm) {
-      signupForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name = document.getElementById("signup-name").value.trim();
-        const phone = document.getElementById("signup-phone").value.trim();
-        const email = document.getElementById("signup-email").value.trim();
-        const password = document.getElementById("signup-password").value;
-        const plate = (document.getElementById("signup-plate")?.value || "").trim().toUpperCase();
-        const vin = (document.getElementById("signup-vin")?.value || "").trim().toUpperCase();
-        const model = document.getElementById("signup-model").value.trim();
-        const miles = parseInt(document.getElementById("signup-miles").value, 10) || 0;
-        const submitBtn = document.getElementById("signup-submit-btn");
-
-        if (password.length < 8) {
-          showAuthError("Password must be at least 8 characters long.");
-          return;
-        }
-
-        const prevText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Creating Account...";
-        hideAuthError();
-
-        const res = await api.post("/auth/signup", {
-          name,
-          email,
-          phone,
-          password,
-          plate,
-          vin,
-          year: model.split(" ")[0] || "2022",
-          model,
-          miles
-        });
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = prevText;
-
-        if (!res.ok) {
-          showAuthError(res.data?.error || "Registration failed. Please check your inputs.");
-          return;
-        }
-
-        state.isAuthenticated = true;
-        if (res.data && res.data.user) {
-          state.user = {
-            name: res.data.user.name,
-            email: res.data.user.email,
-            phone: res.data.user.phone
-          };
-        }
-        if (res.data && res.data.vehicle) {
-          const vehVin = res.data.vehicle.vin || (plate ? `Plate: ${plate}` : "Pending Bay Scan");
-          state.vehicles = [
-            {
-              id: "veh-main",
-              title: `${res.data.vehicle.year || ''} ${res.data.vehicle.model || ''}`.trim() || model,
-              vin: vehVin,
-              plate: plate || "SAVED",
-              miles: String(res.data.vehicle.miles || miles),
-              health: "Certified Good",
-              oilLife: 95,
-              brakesMm: "8.0mm"
-            }
-          ];
-          state.activeVehicleIndex = 0;
-        }
-
-        closeAuthModal();
-        showToast(`Welcome to Habesha Auto, ${state.user.name}!`, "success");
-        await syncBackendData();
-        updateAuthUI();
-        renderHome();
-        renderAccount();
-      });
-    }
-
     // Sign Out Handler & Cleanse
     async function handleSignOut() {
       try {
@@ -2627,14 +2513,49 @@
             ];
             state.activeVehicleIndex = 0;
           }
-          await syncBackendData();
+          try {
+            await syncBackendData();
+          } catch (e) {}
         } else {
-          state.isAuthenticated = false;
+          // Check local storage session cache
+          try {
+            const cached = localStorage.getItem("habesha_user_session");
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (parsed && parsed.user && parsed.user.email) {
+                state.isAuthenticated = true;
+                state.user = parsed.user;
+                if (Array.isArray(parsed.vehicles) && parsed.vehicles.length > 0) {
+                  state.vehicles = parsed.vehicles;
+                  state.activeVehicleIndex = 0;
+                }
+              }
+            } else {
+              state.isAuthenticated = false;
+            }
+          } catch (e) {
+            state.isAuthenticated = false;
+          }
         }
       } catch (e) {
-        state.isAuthenticated = false;
+        try {
+          const cached = localStorage.getItem("habesha_user_session");
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed && parsed.user && parsed.user.email) {
+              state.isAuthenticated = true;
+              state.user = parsed.user;
+              if (Array.isArray(parsed.vehicles) && parsed.vehicles.length > 0) {
+                state.vehicles = parsed.vehicles;
+                state.activeVehicleIndex = 0;
+              }
+            }
+          }
+        } catch (err) {}
       }
       updateAuthUI();
+      renderHome();
+      renderAccount();
     }
 
     checkAuthOnBoot();

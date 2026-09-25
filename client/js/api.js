@@ -2,8 +2,12 @@ var api = (function () {
   "use strict";
 
   function getBaseUrl() {
-    if (typeof window !== 'undefined' && window.location.port && window.location.port !== '3000') {
-      return 'http://localhost:3000/api';
+    if (typeof window !== 'undefined') {
+      var host = window.location.hostname;
+      if ((host === 'localhost' || host === '127.0.0.1') && window.location.port && window.location.port !== '3000') {
+        return 'http://localhost:3000/api';
+      }
+      return '/api';
     }
     return '/api';
   }

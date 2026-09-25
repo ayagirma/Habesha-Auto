@@ -86,6 +86,22 @@ router.post('/signin', async (req, res) => {
   }
 });
 
+router.get(['/me', '/session'], async (req, res) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+  try {
+    const profile = await getProfile(req.session.userId);
+    if (!profile) {
+      return res.status(401).json({ error: 'User profile not found' });
+    }
+    res.json(profile);
+  } catch (err) {
+    console.error('auth me failed', err);
+    res.status(500).json({ error: 'Failed to retrieve active session' });
+  }
+});
+
 router.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('connect.sid');
