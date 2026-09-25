@@ -588,7 +588,13 @@
 
         staffForgotStep1.style.display = "none";
         staffForgotStep2.style.display = "flex";
-        showToast(`6-digit OTP code sent to ${email}`, "success");
+        if (res.data && res.data.devOtp) {
+          showToast(`🔑 [DEV SIMULATOR] Staff OTP Code: ${res.data.devOtp}`, "info");
+          const otpInput = document.getElementById("staff-otp-code");
+          if (otpInput) otpInput.value = res.data.devOtp;
+        } else {
+          showToast(`6-digit OTP code sent to ${email}`, "success");
+        }
       });
     }
 

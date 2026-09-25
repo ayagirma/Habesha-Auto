@@ -138,12 +138,15 @@ router.post('/forgot-password', async (req, res) => {
     );
 
     // Dispatch email
-    await sendOtpEmail(normalizedEmail, otp, userName);
+    const mailResult = await sendOtpEmail(normalizedEmail, otp, userName);
+    const isRealSmtp = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER);
 
     res.json({
       success: true,
       message: `A 6-digit verification code has been sent to ${normalizedEmail}.`,
-      expiresInMinutes: 10
+      expiresInMinutes: 10,
+      devOtp: isRealSmtp ? undefined : otp,
+      deliveryMethod: isRealSmtp ? 'smtp_inbox' : 'dev_simulator'
     });
   } catch (err) {
     console.error('forgot-password failed:', err);

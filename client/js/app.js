@@ -1887,11 +1887,21 @@
           forgotStep1.style.display = "none";
           const forgotStep2 = document.getElementById("forgot-step2-form");
           if (forgotStep2) forgotStep2.style.display = "flex";
-          showToast(`Verification code sent to ${email}`, "success");
-          const otpInput = document.getElementById("reset-otp-code");
-          if (otpInput) {
-            otpInput.value = "";
-            otpInput.focus();
+          
+          if (res.data && res.data.devOtp) {
+            showToast(`🔑 [DEV SIMULATOR] Reset OTP Code: ${res.data.devOtp}`, "info");
+            const otpInput = document.getElementById("reset-otp-code");
+            if (otpInput) {
+              otpInput.value = res.data.devOtp;
+              otpInput.focus();
+            }
+          } else {
+            showToast(`Verification code dispatched to ${email}`, "success");
+            const otpInput = document.getElementById("reset-otp-code");
+            if (otpInput) {
+              otpInput.value = "";
+              otpInput.focus();
+            }
           }
         };
       }
