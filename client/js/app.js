@@ -132,28 +132,16 @@
     phone: "(555) 010-2938"
   };
 
-  const DEFAULT_VEHICLES = [
-    {
-      id: "veh-1",
-      title: "2021 Honda Accord EX-L",
-      vin: "1HGCM82633A004352",
-      plate: "7XYZ890",
-      miles: "62,140",
-      health: "Certified Good",
-      oilLife: 82,
-      brakesMm: "4.2mm (35%)"
-    },
-    {
-      id: "veh-2",
-      title: "2023 Tesla Model Y Long Range",
-      vin: "5YJYGDEE8PF829104",
-      plate: "9ELC321",
-      miles: "18,400",
-      health: "Optimal",
-      oilLife: 100,
-      brakesMm: "9.0mm (85%)"
-    }
-  ];
+  function loadInitialVehicles() {
+    try {
+      const saved = localStorage.getItem("habesha_custom_vehicles");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  }
 
   const DEFAULT_HISTORY = [
     {
@@ -181,8 +169,8 @@
     currentScreen: "home",
     isAuthenticated: false,
     user: JSON.parse(JSON.stringify(DEFAULT_GUEST_USER)),
-    vehicles: JSON.parse(JSON.stringify(DEFAULT_VEHICLES)),
-    activeVehicleIndex: 0,
+    vehicles: loadInitialVehicles(),
+    activeVehicleIndex: loadInitialVehicles().length > 0 ? 0 : -1,
     booking: {
       selectedServices: [],
       date: (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(7).find(d => !d.isClosed) : { dow: "Today", num: new Date().getDate(), month: "Sep", isToday: true },
@@ -279,19 +267,33 @@
   // RENDER: HOME & GARAGE COCKPIT
   // ==========================================
   function renderHome() {
-    const activeVeh = state.vehicles[state.activeVehicleIndex];
-    if (activeVeh) {
-      const vinStr = activeVeh.vin || "Pending Bay Scan";
-      const displayVin = vinStr.startsWith("PLATE:") ? vinStr : `VIN: ${vinStr}`;
-      const navVin = document.getElementById("nav-veh-vin");
-      const navName = document.getElementById("nav-veh-name");
-      const dashTitle = document.getElementById("dash-veh-title");
-      const dashVin = document.getElementById("dash-veh-vin");
+    const activeVeh = (state.activeVehicleIndex >= 0 && state.vehicles[state.activeVehicleIndex]) ? state.vehicles[state.activeVehicleIndex] : null;
+    const navVin = document.getElementById("nav-veh-vin");
+    const navName = document.getElementById("nav-veh-name");
+    const dashTitle = document.getElementById("dash-veh-title");
+    const dashVin = document.getElementById("dash-veh-vin");
+    const dashPill = document.getElementById("dash-veh-status-pill");
 
-      if (navName) navName.textContent = activeVeh.title || "My Vehicle";
-      if (navVin) navVin.textContent = vinStr.startsWith("PLATE:") ? vinStr : (vinStr.length > 12 ? `VIN: ${vinStr.slice(0, 10)}...` : vinStr);
-      if (dashTitle) dashTitle.textContent = activeVeh.title || "My Vehicle";
-      if (dashVin) dashVin.textContent = `${displayVin} • ${activeVeh.miles || 0} miles`;
+    if (activeVeh) {
+      const vinStr = activeVeh.vin || activeVeh.plate || "Registered Vehicle";
+      const displayVin = vinStr.startsWith("PLATE:") ? vinStr : (vinStr.length > 14 ? `VIN: ${vinStr.slice(0, 12)}...` : `Plate: ${vinStr}`);
+
+      if (navName) navName.textContent = activeVeh.title;
+      if (navVin) navVin.textContent = activeVeh.plate ? `Plate: ${activeVeh.plate}` : displayVin;
+      if (dashTitle) dashTitle.textContent = activeVeh.title;
+      if (dashVin) dashVin.textContent = `${activeVeh.plate ? 'Plate: ' + activeVeh.plate : displayVin} • ${activeVeh.miles || 0} miles`;
+      if (dashPill) {
+        dashPill.style.display = "inline-flex";
+        dashPill.textContent = "● " + (activeVeh.health || "Certified Good");
+      }
+    } else {
+      if (navName) navName.textContent = "Select Vehicle";
+      if (navVin) navVin.textContent = "Click to choose or add";
+      if (dashTitle) dashTitle.textContent = "No Vehicle Selected";
+      if (dashVin) dashVin.textContent = "Add your car or sign in to load your saved garage";
+      if (dashPill) {
+        dashPill.style.display = "none";
+      }
     }
 
     // Populate Featured Services on Home
@@ -356,10 +358,19 @@
   }
 
   function renderBooking() {
-    const activeVeh = state.vehicles[state.activeVehicleIndex];
+    const activeVeh = (state.activeVehicleIndex >= 0 && state.vehicles[state.activeVehicleIndex]) ? state.vehicles[state.activeVehicleIndex] : null;
+    const bookTitle = document.getElementById("book-veh-title");
+    const bookVin = document.getElementById("book-veh-vin");
+    const changeBtn = document.getElementById("book-change-veh-btn");
+
     if (activeVeh) {
-      document.getElementById("book-veh-title").textContent = activeVeh.title;
-      document.getElementById("book-veh-vin").textContent = `VIN: ${activeVeh.vin} • ${activeVeh.miles} miles`;
+      if (bookTitle) bookTitle.textContent = activeVeh.title;
+      if (bookVin) bookVin.textContent = `${activeVeh.plate ? 'Plate: ' + activeVeh.plate : (activeVeh.vin || 'VIN Registered')} • ${activeVeh.miles || 0} miles`;
+      if (changeBtn) changeBtn.textContent = "Change Vehicle";
+    } else {
+      if (bookTitle) bookTitle.textContent = "No Vehicle Selected";
+      if (bookVin) bookVin.textContent = "Click to select or enter your vehicle for this booking";
+      if (changeBtn) changeBtn.textContent = "+ Select / Add Vehicle";
     }
 
     // Services Catalog
@@ -851,13 +862,20 @@
           return;
         }
 
+        const activeVeh = (state.activeVehicleIndex >= 0 && state.vehicles[state.activeVehicleIndex]) ? state.vehicles[state.activeVehicleIndex] : null;
+        if (!activeVeh) {
+          showToast("Please select or add a vehicle for this booking.", "warning");
+          openGarage();
+          return;
+        }
+
         const isToday = Boolean(state.booking.date && state.booking.date.isToday);
         const shop = window.GeoTime ? window.GeoTime.isShopOpen() : { isOpen: true };
         const isLiveNow = isToday && shop.isOpen;
 
         const appt = {
           id: "APT-" + Math.floor(100000 + Math.random() * 900000),
-          vehicle: state.vehicles[state.activeVehicleIndex] || state.vehicles[0],
+          vehicle: activeVeh,
           services: [...state.booking.selectedServices],
           date: state.booking.date,
           time: state.booking.time,
@@ -1047,29 +1065,47 @@
     const garageModal = document.getElementById("garage-modal");
     const openGarageBtn = document.getElementById("open-garage-modal-btn");
     const navVehSelector = document.getElementById("nav-veh-selector");
+    const bookChangeVehBtn = document.getElementById("book-change-veh-btn");
     const closeGarageBtn = document.getElementById("close-garage-modal-btn");
 
     function openGarage() {
       renderGarageModal();
-      garageModal.classList.add("active");
+      if (garageModal) garageModal.classList.add("active");
     }
     function closeGarage() {
-      garageModal.classList.remove("active");
+      if (garageModal) garageModal.classList.remove("active");
     }
 
     if (openGarageBtn) openGarageBtn.addEventListener("click", openGarage);
     if (navVehSelector) navVehSelector.addEventListener("click", openGarage);
+    if (bookChangeVehBtn) bookChangeVehBtn.addEventListener("click", openGarage);
     if (closeGarageBtn) closeGarageBtn.addEventListener("click", closeGarage);
 
     function renderGarageModal() {
       const container = document.getElementById("modal-garage-vehicles");
       if (!container) return;
 
+      if (!state.vehicles.length) {
+        container.innerHTML = `
+          <div style="padding:16px; text-align:center; background:var(--bg-input); border-radius:8px; color:var(--text-secondary); font-size:13px; line-height:1.6;">
+            🚗 No vehicles in your garage yet.<br>Add your vehicle using the quick form below, or <button class="btn-link" style="color:var(--accent); text-decoration:underline; background:none; border:none; cursor:pointer; font-weight:600;" id="modal-signin-link">Sign In</button> to load your saved garage.
+          </div>
+        `;
+        const link = document.getElementById("modal-signin-link");
+        if (link) {
+          link.addEventListener("click", () => {
+            closeGarage();
+            openAuthModal("signin");
+          });
+        }
+        return;
+      }
+
       container.innerHTML = state.vehicles.map((v, idx) => `
         <div class="card" style="padding:14px; background:${idx === state.activeVehicleIndex ? 'var(--bg-elevated)' : 'var(--bg-input)'}; border-color:${idx === state.activeVehicleIndex ? 'var(--accent)' : 'var(--border-subtle)'}; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" data-idx="${idx}">
           <div>
             <div style="font-weight:700; font-size:14.5px; color:#fff;">${v.title}</div>
-            <div style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">Plate: ${v.plate} &bull; ${v.miles} miles</div>
+            <div style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">Plate: ${v.plate || 'N/A'} &bull; ${v.miles || 0} miles</div>
           </div>
           ${idx === state.activeVehicleIndex ? '<span class="pill pill-accent">Active</span>' : '<button class="btn btn-outline btn-sm">Select</button>'}
         </div>
@@ -1080,7 +1116,8 @@
           state.activeVehicleIndex = parseInt(item.getAttribute("data-idx"));
           closeGarage();
           renderHome();
-          showToast(`Switched active garage vehicle to ${state.vehicles[state.activeVehicleIndex].title}`, "info");
+          renderBooking();
+          showToast(`Selected ${state.vehicles[state.activeVehicleIndex].title} for service`, "info");
         });
       });
     }
@@ -1089,25 +1126,36 @@
     if (addVehForm) {
       addVehForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const model = document.getElementById("new-veh-model").value;
-        const plate = document.getElementById("new-veh-vin").value || "NEW-VEH";
-        const miles = document.getElementById("new-veh-miles").value || "12,000";
+        const model = document.getElementById("new-veh-model").value.trim();
+        const plate = document.getElementById("new-veh-vin").value.trim() || "NEW-VEH";
+        const miles = document.getElementById("new-veh-miles").value.trim() || "12,000";
 
-        state.vehicles.push({
+        if (!model) {
+          showToast("Please enter vehicle model", "warning");
+          return;
+        }
+
+        const newVeh = {
           id: "veh-" + (state.vehicles.length + 1),
           title: model,
-          vin: "1" + Math.random().toString(36).substring(2, 18).toUpperCase(),
+          vin: plate.length === 17 ? plate : ("1" + Math.random().toString(36).substring(2, 10).toUpperCase()),
           plate: plate,
           miles: miles,
           health: "Certified Good",
           oilLife: 95,
           brakesMm: "8.0mm (80%)"
-        });
+        };
 
+        state.vehicles.push(newVeh);
         state.activeVehicleIndex = state.vehicles.length - 1;
+        try {
+          localStorage.setItem("habesha_custom_vehicles", JSON.stringify(state.vehicles));
+        } catch (e) {}
+
         closeGarage();
         renderHome();
-        showToast(`${model} added to your digital garage!`, "success");
+        renderBooking();
+        showToast(`${model} added and selected as active vehicle!`, "success");
         addVehForm.reset();
       });
     }
@@ -1644,8 +1692,11 @@
       }
       state.isAuthenticated = false;
       state.user = JSON.parse(JSON.stringify(DEFAULT_GUEST_USER));
-      state.vehicles = JSON.parse(JSON.stringify(DEFAULT_VEHICLES));
-      state.activeVehicleIndex = 0;
+      state.vehicles = [];
+      state.activeVehicleIndex = -1;
+      try {
+        localStorage.removeItem("habesha_custom_vehicles");
+      } catch (e) {}
       state.history = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
       state.messages = JSON.parse(JSON.stringify(DEFAULT_MESSAGES));
       state.progress.stepIndex = 2;
