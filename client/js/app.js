@@ -1423,12 +1423,15 @@
 
       const initials = getUserInitials(state.user.name);
 
+      const userMenuWrapper = document.querySelector(".user-menu-wrapper");
+
       if (state.isAuthenticated) {
         if (navAuthBtn) navAuthBtn.style.display = "none";
+        if (userMenuWrapper) userMenuWrapper.style.display = "block";
         if (navAvatar) {
           navAvatar.style.display = "flex";
           navAvatar.textContent = initials;
-          navAvatar.title = `Signed in as ${state.user.name} — Account Passport`;
+          navAvatar.title = `Signed in as ${state.user.name} — Account Menu`;
         }
         if (accountAuthBadge) {
           accountAuthBadge.className = "auth-badge cloud";
@@ -1438,10 +1441,9 @@
         if (signinAccountBtn) signinAccountBtn.style.display = "none";
       } else {
         if (navAuthBtn) navAuthBtn.style.display = "inline-flex";
+        if (userMenuWrapper) userMenuWrapper.style.display = "none";
         if (navAvatar) {
-          navAvatar.style.display = "flex";
-          navAvatar.textContent = "GD";
-          navAvatar.title = "Guest Driver — View Vehicle Passport & Records";
+          navAvatar.style.display = "none";
         }
         if (accountAuthBadge) {
           accountAuthBadge.className = "auth-badge guest";
