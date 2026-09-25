@@ -174,13 +174,13 @@
             </div>
             <div>
               ${isCurrent ? `
-                <button class="btn btn-primary btn-sm btn-advance-step" data-step="${idx + 1}" style="font-size:11.5px; padding:6px 12px;">
+                <button class="btn btn-primary btn-advance-step" data-step="${idx + 1}" style="font-size:12.5px; font-weight:700; padding:9px 18px; background:linear-gradient(135deg, #ff5a1f 0%, #ea580c 100%); color:#fff; border:none; border-radius:var(--radius-sm); box-shadow:0 4px 14px rgba(255,90,31,0.45); cursor:pointer; display:inline-flex; align-items:center; gap:6px; letter-spacing:0.2px;">
                   Complete &amp; Advance &rarr;
                 </button>
               ` : (isDone ? `
-                <span style="font-size:11.5px; color:#34d399; font-weight:600;">Completed</span>
+                <span style="font-size:12px; color:#34d399; font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:6px 10px; background:rgba(34,197,94,0.12); border-radius:var(--radius-sm); border:1px solid rgba(34,197,94,0.25);">&#x2714; Done</span>
               ` : `
-                <button class="btn btn-ghost btn-sm btn-advance-step" data-step="${idx}" style="font-size:11px; padding:4px 8px; color:var(--text-muted);">
+                <button class="btn btn-ghost btn-sm btn-advance-step" data-step="${idx}" style="font-size:11.5px; padding:6px 10px; color:var(--text-muted); border:1px solid var(--border-subtle);">
                   Jump Here
                 </button>
               `)}
@@ -311,7 +311,7 @@
     // Live Clock
     const liveClock = document.getElementById("live-clock");
     if (liveClock && window.GeoTime) {
-      window.GeoTime.bindLiveClock("live-clock");
+      window.GeoTime.bindLiveClock("live-clock", { context: "staff" });
     } else if (liveClock) {
       setInterval(() => {
         liveClock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " • Today";
@@ -338,14 +338,38 @@
         document.getElementById("scan-vin-input").value = bay.vehicle.vin.startsWith("PENDING") ? "" : bay.vehicle.vin;
         document.getElementById("scan-plate-input").value = bay.vehicle.plate || "";
       }
-      scanVinModal.classList.add("active");
+      if (scanVinModal) {
+        scanVinModal.style.display = "flex";
+        scanVinModal.removeAttribute("inert");
+        scanVinModal.setAttribute("aria-hidden", "false");
+        scanVinModal.classList.add("active");
+        const input = document.getElementById("scan-vin-input");
+        if (input) setTimeout(() => input.focus(), 50);
+      }
     }
     function closeScanModal() {
-      scanVinModal.classList.remove("active");
+      if (scanVinModal) {
+        scanVinModal.classList.remove("active");
+        scanVinModal.style.display = "none";
+        scanVinModal.setAttribute("inert", "");
+        scanVinModal.setAttribute("aria-hidden", "true");
+      }
     }
 
     if (openScanVinBtn) openScanVinBtn.addEventListener("click", openScanModal);
     if (closeScanVinBtn) closeScanVinBtn.addEventListener("click", closeScanModal);
+    if (scanVinModal) {
+      scanVinModal.addEventListener("click", (e) => {
+        if (e.target === scanVinModal) closeScanModal();
+      });
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeScanModal();
+        closeFindingModal();
+      }
+    });
 
     if (autoScanObdBtn) {
       autoScanObdBtn.addEventListener("click", () => {
@@ -382,14 +406,37 @@
     const findingForm = document.getElementById("finding-protocol-form");
 
     function openFindingModal() {
-      findingModal.classList.add("active");
+      if (findingModal) {
+        findingModal.style.display = "flex";
+        findingModal.removeAttribute("inert");
+        findingModal.setAttribute("aria-hidden", "false");
+        findingModal.classList.add("active");
+        const input = document.getElementById("fnd-title-input");
+        if (input) setTimeout(() => input.focus(), 50);
+      }
     }
     function closeFindingModal() {
-      findingModal.classList.remove("active");
+      if (findingModal) {
+        findingModal.classList.remove("active");
+        findingModal.style.display = "none";
+        findingModal.setAttribute("inert", "");
+        findingModal.setAttribute("aria-hidden", "true");
+      }
     }
 
     if (openFindingBtn) openFindingBtn.addEventListener("click", openFindingModal);
     if (closeFindingBtn) closeFindingBtn.addEventListener("click", closeFindingModal);
+    if (findingModal) {
+      findingModal.addEventListener("click", (e) => {
+        if (e.target === findingModal) closeFindingModal();
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeScanModal();
+        closeFindingModal();
+      }
+    });
 
     if (findingForm) {
       findingForm.addEventListener("submit", async (e) => {

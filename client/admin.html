@@ -113,8 +113,8 @@
       <a href="index.html" class="brand-logo" style="text-decoration:none;">
         <span class="logo-mark" id="admin-logo-badge" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);">H</span>
         <div class="logo-text">
-          <span class="brand-name">HABESHA <span class="accent-dot">&bull;</span> AUTO</span>
-          <span class="brand-sub" id="admin-sub-title">STAFF PORTAL &bull; ROLE-BASED ACCESS</span>
+          <span class="brand-name">HABESHA <span class="accent-dot">•</span> AUTO</span>
+          <span class="brand-sub" id="admin-sub-title">STAFF PORTAL • ROLE-BASED ACCESS</span>
         </div>
       </a>
       <span class="pill pill-good" id="admin-role-badge">Authenticated</span>
@@ -168,7 +168,7 @@
       </div>
 
       <!-- Staff Sign In Form -->
-      <form id="staff-signin-form" method="POST" action="#" style="display:flex; flex-direction:column; gap:14px;">
+      <form id="staff-signin-form" action="javascript:void(0);" onsubmit="return false;" style="display:flex; flex-direction:column; gap:14px;">
         <div class="field-group">
           <label class="field-label" for="staff-signin-email">Staff Email Address</label>
           <input type="email" class="field-input" id="staff-signin-email" name="email" placeholder="girma.ayele@habeshaauto.com" required autocomplete="email">
@@ -203,7 +203,7 @@
 
       <!-- Staff Forgot Password Form -->
       <div id="staff-forgot-container" style="display:none; flex-direction:column; gap:14px;">
-        <form id="staff-forgot-step1" method="POST" action="#" style="display:flex; flex-direction:column; gap:12px;">
+        <form id="staff-forgot-step1" action="javascript:void(0);" onsubmit="return false;" style="display:flex; flex-direction:column; gap:12px;">
           <p style="font-size:13px; color:var(--text-muted); margin:0; line-height:1.5;">
             Enter your staff email address to receive a 6-digit One-Time Password (OTP) to reset your staff login password.
           </p>
@@ -219,7 +219,7 @@
           </button>
         </form>
 
-        <form id="staff-forgot-step2" method="POST" action="#" style="display:none; flex-direction:column; gap:12px;">
+        <form id="staff-forgot-step2" action="javascript:void(0);" onsubmit="return false;" style="display:none; flex-direction:column; gap:12px;">
           <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:8px; padding:10px 12px; font-size:12px; color:#fde68a;">
             <span>OTP sent to </span><strong id="staff-forgot-target-email">staff email</strong>. Valid for 10 minutes.
           </div>
@@ -241,7 +241,7 @@
       </div>
 
       <!-- Staff Registration Form -->
-      <form id="staff-signup-form" method="POST" action="#" style="display:none; flex-direction:column; gap:12px;">
+      <form id="staff-signup-form" action="javascript:void(0);" onsubmit="return false;" style="display:none; flex-direction:column; gap:12px;">
         <div class="field-group">
           <label class="field-label" for="staff-reg-name">Full Legal Name</label>
           <input type="text" class="field-input" id="staff-reg-name" name="name" placeholder="e.g. Brandon Fox" required autocomplete="name">
@@ -549,7 +549,7 @@
   </section>
 
   <!-- ==================== MODAL: SCAN / VERIFY VIN ==================== -->
-  <div class="modal-overlay" id="admin-scan-vin-modal">
+  <div class="modal-overlay" id="admin-scan-vin-modal" style="display:none;" inert aria-hidden="true">
     <div class="modal-card" style="max-width:480px;">
       <div class="section-header" style="margin-bottom:16px;">
         <div>

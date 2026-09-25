@@ -116,4 +116,58 @@ describe('GeoTime Engine (client/js/geo-time.js)', () => {
     expect(GeoTime.BUSINESS_HOURS.keyDropPolicy).toContain('business hours');
     expect(GeoTime.BUSINESS_HOURS.keyDropPolicy).toContain('NO responsibility or liability');
   });
+
+  test('parses 12-hour AM/PM time strings into minutes from midnight', () => {
+    expect(GeoTime.parseTimeToMinutes('8:00 AM')).toBe(480);
+    expect(GeoTime.parseTimeToMinutes('12:00 PM')).toBe(720);
+    expect(GeoTime.parseTimeToMinutes('1:30 PM')).toBe(810);
+    expect(GeoTime.parseTimeToMinutes('4:30 PM')).toBe(990);
+    expect(GeoTime.parseTimeToMinutes('12:15 AM')).toBe(15);
+  });
+
+  test('parses human-readable service duration strings accurately', () => {
+    expect(GeoTime.getServiceDurationMinutes('45 mins')).toBe(45);
+    expect(GeoTime.getServiceDurationMinutes('1.5 hrs')).toBe(90);
+    expect(GeoTime.getServiceDurationMinutes('1 hr')).toBe(60);
+    expect(GeoTime.getServiceDurationMinutes('2.0 hrs')).toBe(120);
+    expect(GeoTime.getServiceDurationMinutes('1.5 – 2.0 hrs')).toBe(120);
+  });
+
+  test('filters and disables late time slots for multi-service stacked durations exceeding closing time', () => {
+    // Weekday: closes at 5:00 PM (1020 mins). Job duration: 2.5 hours (150 mins).
+    // A 4:30 PM slot (990 mins) + 150 mins = 1140 mins > 1020 mins -> MUST be disabled!
+    // A 3:30 PM slot (930 mins) + 150 mins = 1080 mins > 1020 mins -> MUST be disabled!
+    // A 2:00 PM slot (840 mins) + 150 mins = 990 mins <= 1020 mins -> Available!
+    const slots = GeoTime.getDetailedTimeSlots(1, false, 150);
+    const slot2pm = slots.find(s => s.time === '2:00 PM');
+    const slot330pm = slots.find(s => s.time === '3:30 PM');
+    const slot430pm = slots.find(s => s.time === '4:30 PM');
+
+    expect(slot2pm.isAvailable).toBe(true);
+    expect(slot2pm.isExceedingClose).toBe(false);
+
+    expect(slot330pm.isAvailable).toBe(false);
+    expect(slot330pm.isExceedingClose).toBe(true);
+    expect(slot330pm.reason).toContain('Exceeds 5:00 PM close');
+
+    expect(slot430pm.isAvailable).toBe(false);
+    expect(slot430pm.isExceedingClose).toBe(true);
+    expect(slot430pm.reason).toContain('Exceeds 5:00 PM close');
+  });
+
+  test('disables past time slots when booking for today after hours', () => {
+    // Simulate current time at 2:00 PM (840 mins)
+    const mockTodayDate = new Date('2026-09-24T14:00:00');
+    // For today (weekday) at 2:00 PM, morning slots (8:00 AM, 9:30 AM, 11:00 AM, 12:30 PM) are past
+    const slots = GeoTime.getDetailedTimeSlots(1, true, 45, mockTodayDate);
+    const slot8am = slots.find(s => s.time === '8:00 AM');
+    const slot11am = slots.find(s => s.time === '11:00 AM');
+
+    expect(slot8am.isPast).toBe(true);
+    expect(slot8am.isAvailable).toBe(false);
+    expect(slot8am.reason).toBe('Past time slot');
+
+    expect(slot11am.isPast).toBe(true);
+    expect(slot11am.isAvailable).toBe(false);
+  });
 });

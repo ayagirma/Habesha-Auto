@@ -20,13 +20,15 @@
       --test-text: #f3f4f6;
       --test-muted: #8b949e;
     }
-    body {
+    body.test-layout, html {
+      display: block !important;
+      width: 100% !important;
+      min-height: 100vh;
+      margin: 0 !important;
+      padding: 0 !important;
       background: var(--test-bg);
       color: var(--test-text);
       font-family: 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
     }
     .test-header {
       background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
@@ -37,6 +39,8 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
+      width: 100% !important;
+      box-sizing: border-box;
     }
     .test-logo {
       display: flex;
@@ -44,14 +48,15 @@
       gap: 12px;
     }
     .test-logo-badge {
-      background: #ea580c;
+      background: linear-gradient(135deg, #ff5a1f 0%, #ea580c 100%);
       color: #fff;
       font-family: 'Outfit', sans-serif;
       font-weight: 800;
-      font-size: 16px;
-      padding: 6px 12px;
+      font-size: 15px;
+      padding: 6px 14px;
       border-radius: 8px;
       letter-spacing: 0.5px;
+      box-shadow: 0 2px 10px rgba(255, 90, 31, 0.3);
     }
     .test-title {
       font-family: 'Outfit', sans-serif;
@@ -93,9 +98,11 @@
       border-color: var(--test-accent);
     }
     .test-container {
+      width: 100% !important;
       max-width: 1400px;
-      margin: 0 auto;
+      margin: 0 auto !important;
       padding: 24px;
+      box-sizing: border-box;
     }
     .metrics-ribbon {
       display: grid;
@@ -354,13 +361,13 @@
     }
   </style>
 </head>
-<body>
+<body class="test-layout">
 
   <header class="test-header">
     <div class="test-logo">
-      <span class="test-logo-badge">TORQUE & CO</span>
+      <span class="test-logo-badge">⚡ HABESHA AUTO</span>
       <div>
-        <h1 class="test-title">Quality Assurance & Component Health Monitor</h1>
+        <h1 class="test-title">Quality Assurance &amp; Subsystem Health Monitor</h1>
         <div class="test-subtitle" id="live-clock">Loading live shop clock...</div>
       </div>
     </div>
@@ -434,7 +441,9 @@
 
     <!-- TAB 3: Logs Terminal -->
     <section id="tab-logs" style="display: none;">
-      <div class="log-terminal" id="log-terminal">Initializing Torque & Co Diagnostic Console...\nReady to execute live automated test assertions.\n</div>
+      <div class="log-terminal" id="log-terminal">Initializing Habesha Auto Diagnostic Console...
+Ready to execute live automated test assertions.
+</div>
     </section>
 
   </main>
@@ -444,7 +453,7 @@
   <script>
     // Initialize Live Clock
     if (window.GeoTime) {
-      window.GeoTime.bindLiveClock("live-clock");
+      window.GeoTime.bindLiveClock("live-clock", { context: "staff" });
     }
 
     let activeTab = 'tests';
@@ -472,7 +481,7 @@
     // Render Component Inventory Matrix
     function renderComponentMatrix() {
       const container = document.getElementById('tab-matrix');
-      const comps = window.TorqueTestRunner.components;
+      const comps = (window.HabeshaTestRunner || window.TorqueTestRunner).components;
       document.getElementById('metric-total-comp').innerText = comps.length;
 
       container.innerHTML = comps.map(c => `
@@ -488,7 +497,7 @@
     // Render Test List
     function renderTestList() {
       const container = document.getElementById('tab-tests');
-      const tests = window.TorqueTestRunner.tests;
+      const tests = (window.HabeshaTestRunner || window.TorqueTestRunner).tests;
 
       container.innerHTML = tests.map(t => `
         <div class="test-row" id="row-${t.id}">
@@ -512,7 +521,7 @@
       badge.innerText = 'RUNNING...';
 
       try {
-        const res = await window.TorqueTestRunner.runSingleTest(testId);
+        const res = await (window.HabeshaTestRunner || window.TorqueTestRunner).runSingleTest(testId);
         badge.className = 'test-status-badge badge-passed';
         badge.innerText = `PASSED (${res.latency}ms)`;
         meta.innerText = res.message;
@@ -525,16 +534,24 @@
       }
     }
 
+    // Helper: calculate 95th percentile latency from an array of latencies
+    function calculateP95(latencies) {
+      if (!latencies || latencies.length === 0) return 0;
+      const sorted = [...latencies].sort((a, b) => a - b);
+      const index = Math.ceil(0.95 * sorted.length) - 1;
+      return sorted[Math.max(0, index)];
+    }
+
     async function startAllTests() {
-      logMsg("Initiating Full Quality Assurance Suite Execution...", "info");
+      logMsg("Initiating Habesha Auto Quality Assurance Suite Execution...", "info");
       let passed = 0;
       let failed = 0;
-      let totalLatency = 0;
+      const recordedLatencies = [];
 
       const progressBar = document.getElementById('suite-progress');
       progressBar.style.width = '0%';
 
-      const tests = window.TorqueTestRunner.tests;
+      const tests = (window.HabeshaTestRunner || window.TorqueTestRunner).tests;
       for (let i = 0; i < tests.length; i++) {
         const test = tests[i];
         const badge = document.getElementById(`badge-${test.id}`);
@@ -545,7 +562,7 @@
         try {
           const res = await test.run();
           passed++;
-          totalLatency += res.latency;
+          recordedLatencies.push(res.latency || 0);
           badge.className = 'test-status-badge badge-passed';
           badge.innerText = `PASSED (${res.latency}ms)`;
           meta.innerText = res.message;
@@ -565,17 +582,23 @@
         document.getElementById('metric-failed').innerText = failed;
       }
 
-      const avgLat = passed > 0 ? Math.round(totalLatency / passed) : 0;
-      document.getElementById('metric-latency').innerText = `Avg Latency: ${avgLat} ms`;
+      const avgLat = recordedLatencies.length > 0 
+        ? Math.round(recordedLatencies.reduce((a, b) => a + b, 0) / recordedLatencies.length) 
+        : 0;
+      const p95Lat = calculateP95(recordedLatencies);
+
+      document.getElementById('metric-latency').innerText = `Avg: ${avgLat} ms • p95: ${p95Lat} ms`;
       document.getElementById('metric-health').innerText = failed === 0 ? 'HEALTHY (100%)' : 'DEGRADED';
       document.getElementById('metric-health').style.color = failed === 0 ? 'var(--test-green)' : 'var(--test-red)';
-      logMsg(`Suite Completed: ${passed} passed, ${failed} failed. Average latency ${avgLat}ms.`, failed === 0 ? 'pass' : 'fail');
+      logMsg(`Suite Completed: ${passed} passed, ${failed} failed. Avg Latency: ${avgLat}ms | p95: ${p95Lat}ms.`, failed === 0 ? 'pass' : 'fail');
     }
 
     async function runBackendOnly() {
       await runSingle('test-health');
       await runSingle('test-tech-bays');
       await runSingle('test-mgr-kpis');
+      await runSingle('test-neg-vin');
+      await runSingle('test-neg-otp');
     }
 
     async function runGeoOnly() {
@@ -593,10 +616,12 @@
 
       // Quick initial ping
       try {
-        const h = await window.TorqueTestRunner.apiFetch('/health');
+        const runner = window.HabeshaTestRunner || window.TorqueTestRunner;
+        const h = await runner.apiFetch('/health');
         if (h.ok) {
           document.getElementById('metric-health').innerText = 'ONLINE';
           document.getElementById('metric-health').style.color = 'var(--test-green)';
+          document.getElementById('metric-latency').innerText = `Ping Latency: ${h.latency} ms`;
           logMsg(`Backend API connected. Uptime: ${h.data.uptime}s • Database: ${h.data.database}`, 'pass');
         } else {
           document.getElementById('metric-health').innerText = 'OFFLINE';

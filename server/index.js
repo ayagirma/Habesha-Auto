@@ -136,16 +136,39 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// Explicit routes for unified staff portal & test dashboard
+// Explicit routes for all client portals & test dashboard
+app.get(['/', '/index.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'index.html'));
+});
+app.post(['/', '/index.html'], (req, res) => {
+  res.redirect('/');
+});
+
+app.get(['/tech', '/tech.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'tech.html'));
+});
+
+app.get(['/manager', '/manager.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'manager.html'));
+});
+
 app.get(['/admin', '/admin.html'], (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'client', 'admin.html'));
 });
 
-app.get(['/test', '/test.html'], (req, res) => {
+app.get(['/test', '/test.html', '/qa'], (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'client', 'test.html'));
 });
 
 app.use(express.static(path.join(__dirname, '..', 'client')));
+
+// SPA fallback for unknown non-API GET requests
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, '..', 'client', 'index.html'));
+});
 
 if (require.main === module) {
   app.listen(PORT, () => {

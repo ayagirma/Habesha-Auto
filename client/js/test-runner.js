@@ -1,7 +1,7 @@
 /**
- * TORQUE & CO — IN-BROWSER INTERACTIVE TEST ENGINE & COMPONENT AUDITOR
+ * HABESHA AUTO — IN-BROWSER INTERACTIVE TEST ENGINE & COMPONENT AUDITOR
  * Executes live browser-side integration tests, client module unit assertions,
- * and end-to-end multi-portal workflow simulations.
+ * negative / error resilience assertions, and end-to-end multi-portal simulations.
  */
 
 (function (window) {
@@ -367,7 +367,75 @@
     }
   });
 
-  window.TorqueTestRunner = {
+  // --- NEGATIVE & ERROR STATE TESTS ---
+
+  // 11. Negative Case: Invalid / Non-Existent Bay VIN Mutation Rejection
+  TEST_REGISTRY.push({
+    id: "test-neg-vin",
+    name: "Negative: Invalid & Non-Existent Bay VIN Mutation Rejection",
+    category: "Error & Resilience",
+    componentId: "srv-tech",
+    run: async () => {
+      const res = await apiFetch('/tech/bays/bay-nonexistent-999/vin', {
+        method: 'PUT',
+        body: { vin: "INVALID_VIN_FORMAT_123" }
+      });
+      if (res.status !== 404) {
+        throw new Error(`Expected HTTP 404 for non-existent bay VIN update, got ${res.status}`);
+      }
+      return {
+        message: `HTTP 404 cleanly rejected non-existent bay mutation with: "${res.data ? res.data.error : 'Bay not found'}"`,
+        latency: res.latency,
+        data: res.data
+      };
+    }
+  });
+
+  // 12. Negative Case: Expired or Incorrect 6-Digit OTP Rejection
+  TEST_REGISTRY.push({
+    id: "test-neg-otp",
+    name: "Negative: Expired / Incorrect 6-Digit OTP Verification Rejection",
+    category: "Error & Resilience",
+    componentId: "srv-auth",
+    run: async () => {
+      const res = await apiFetch('/auth/verify-otp', {
+        method: 'POST',
+        body: { email: "nonexistent.driver@example.com", otp: "000000" }
+      });
+      if (res.status !== 400 || !res.data || !res.data.error) {
+        throw new Error(`Expected HTTP 400 with error payload for invalid OTP, got ${res.status}`);
+      }
+      return {
+        message: `HTTP 400 rejected bad OTP with: "${res.data.error}"`,
+        latency: res.latency,
+        data: res.data
+      };
+    }
+  });
+
+  // 13. Negative Case: Unauthorized / Non-Existent Bay Step Mutation
+  TEST_REGISTRY.push({
+    id: "test-neg-bay",
+    name: "Negative: Unauthorized / Non-Existent Bay Step Mutation",
+    category: "Error & Resilience",
+    componentId: "tech-steps",
+    run: async () => {
+      const res = await apiFetch('/tech/bays/invalid-bay-xyz/step', {
+        method: 'PUT',
+        body: { stepIndex: 99 }
+      });
+      if (res.status !== 404) {
+        throw new Error(`Expected HTTP 404 for invalid bay ID, got ${res.status}`);
+      }
+      return {
+        message: `HTTP 404 rejected invalid bay step mutation cleanly`,
+        latency: res.latency,
+        data: res.data
+      };
+    }
+  });
+
+  const runnerInstance = {
     components: COMPONENT_INVENTORY,
     tests: TEST_REGISTRY,
     apiFetch,
@@ -394,5 +462,8 @@
       return results;
     }
   };
+
+  window.HabeshaTestRunner = runnerInstance;
+  window.TorqueTestRunner = runnerInstance;
 
 })(typeof window !== "undefined" ? window : global);

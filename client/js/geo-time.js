@@ -180,6 +180,89 @@
     return ["8:00 AM", "9:30 AM", "11:00 AM", "12:30 PM", "2:00 PM", "3:30 PM", "4:30 PM"];
   }
 
+  // Parse time string like "8:00 AM", "12:30 PM", "2:00 PM" into minutes from midnight (0 - 1440)
+  function parseTimeToMinutes(timeStr) {
+    if (!timeStr || typeof timeStr !== "string") return 0;
+    const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (!match) return 0;
+    let hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const ampm = match[3].toUpperCase();
+    if (ampm === "PM" && hours < 12) hours += 12;
+    if (ampm === "AM" && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  }
+
+  // Parse human-readable service duration into minutes (e.g. "1.5 hrs" -> 90, "45 mins" -> 45, "1.0 hr" -> 60)
+  function getServiceDurationMinutes(durationStr) {
+    if (!durationStr || typeof durationStr !== "string") return 60;
+    const str = durationStr.toLowerCase();
+    if (str.includes("–") || str.includes("-")) {
+      const parts = str.split(/[–-]/);
+      return getServiceDurationMinutes(parts[parts.length - 1]);
+    }
+    const hrMatch = str.match(/([\d.]+)\s*(?:hr|hour)/);
+    if (hrMatch) {
+      return Math.round(parseFloat(hrMatch[1]) * 60);
+    }
+    const minMatch = str.match(/(\d+)\s*(?:min|m)/);
+    if (minMatch) {
+      return parseInt(minMatch[1], 10);
+    }
+    return 60;
+  }
+
+  // Evaluate time slots for a day considering current time (if today) and cumulative service duration vs closing hour
+  function getDetailedTimeSlots(dayOfWeek, isToday = false, durationMinutes = 60, baseDate = new Date()) {
+    const rawSlots = getTimeSlotsForDay(dayOfWeek);
+    if (!rawSlots || rawSlots.length === 0) return [];
+
+    const sched = BUSINESS_HOURS.schedule[dayOfWeek];
+    const closeMinOfDay = sched ? (sched.closeHour * 60 + sched.closeMinute) : 1020; // 5:00 PM default (17:00)
+    const closeLabel = sched ? (sched.closeHour > 12 ? `${sched.closeHour - 12}:00 PM` : `${sched.closeHour}:00 AM`) : "5:00 PM";
+
+    let currentMinutesOfDay = 0;
+    if (isToday) {
+      const d = (baseDate instanceof Date) ? baseDate : new Date(baseDate);
+      const geo = detectGeoTimezone();
+      try {
+        const hourFormatter = new Intl.DateTimeFormat(geo.locale, { hour: "numeric", hour12: false, timeZone: geo.timeZone });
+        const minFormatter = new Intl.DateTimeFormat(geo.locale, { minute: "numeric", timeZone: geo.timeZone });
+        const h = parseInt(hourFormatter.format(d), 10);
+        const m = parseInt(minFormatter.format(d), 10);
+        currentMinutesOfDay = h * 60 + m;
+      } catch (e) {
+        currentMinutesOfDay = d.getHours() * 60 + d.getMinutes();
+      }
+    }
+
+    return rawSlots.map(slotTime => {
+      const slotMinutes = parseTimeToMinutes(slotTime);
+      const isPast = isToday && (slotMinutes < currentMinutesOfDay + 30); // 30-min lead buffer
+      const finishMinutes = slotMinutes + durationMinutes;
+      const isExceedingClose = finishMinutes > closeMinOfDay;
+      const isAvailable = !isPast && !isExceedingClose;
+
+      let reason = "";
+      if (isPast) {
+        reason = "Past time slot";
+      } else if (isExceedingClose) {
+        const durHours = (durationMinutes / 60).toFixed(1).replace(/\.0$/, "");
+        reason = `Exceeds ${closeLabel} close (${durHours}h work)`;
+      }
+
+      return {
+        time: slotTime,
+        minutes: slotMinutes,
+        finishMinutes,
+        isPast,
+        isExceedingClose,
+        isAvailable,
+        reason
+      };
+    });
+  }
+
   // Dynamically calculate the 5 workflow steps relative to current time and step index
   function getWorkflowSteps(currentStepIndex = 2, baseDate = new Date()) {
     const stepOffsetsByCurrent = {
@@ -230,14 +313,50 @@
     }
     const targetOffsets = [75, 60, 35, 15, 5];
     const mins = targetOffsets[Math.min(Math.max(currentStepIndex, 0), 4)] || 15;
+
+    const shopStatus = isShopOpen(baseDate);
+    if (!shopStatus.isOpen) {
+      const d = (baseDate instanceof Date) ? new Date(baseDate) : new Date();
+      let dayOfWeek = d.getDay();
+      let sched = BUSINESS_HOURS.schedule[dayOfWeek];
+      const currentMinOfDay = d.getHours() * 60 + d.getMinutes();
+      const openMinToday = sched ? (sched.openHour * 60 + sched.openMinute) : 480;
+
+      if (sched && !sched.isClosed && currentMinOfDay < openMinToday) {
+        const targetMin = openMinToday + mins;
+        const targetHour = Math.floor(targetMin / 60);
+        const targetMinute = targetMin % 60;
+        const etaDate = new Date(d);
+        etaDate.setHours(targetHour, targetMinute, 0, 0);
+        return `${formatTime(etaDate)} (Reopening)`;
+      } else {
+        const nextDay = new Date(d);
+        nextDay.setDate(nextDay.getDate() + 1);
+        let nextDow = nextDay.getDay();
+        let nextSched = BUSINESS_HOURS.schedule[nextDow];
+        while (!nextSched || nextSched.isClosed) {
+          nextDay.setDate(nextDay.getDate() + 1);
+          nextDow = nextDay.getDay();
+          nextSched = BUSINESS_HOURS.schedule[nextDow];
+        }
+        const openMin = nextSched.openHour * 60 + nextSched.openMinute;
+        const targetMin = openMin + mins;
+        const targetHour = Math.floor(targetMin / 60);
+        const targetMinute = targetMin % 60;
+        nextDay.setHours(targetHour, targetMinute, 0, 0);
+        const dayLabel = (nextDay.getDate() === d.getDate() + 1) ? "Tomorrow" : nextDay.toLocaleDateString("en-US", { weekday: "short" });
+        return `${dayLabel} ${formatTime(nextDay)} (Reopening)`;
+      }
+    }
+
     return formatTime(getRelativeDate(mins, baseDate));
   }
 
   // Generate real calendar days for online booking starting today in viewer's timezone
-  function getBookingDays(count = 7) {
+  function getBookingDays(count = 7, durationMinutes = 60, baseDate = new Date()) {
     const geo = detectGeoTimezone();
     const days = [];
-    const now = new Date();
+    const now = (baseDate instanceof Date) ? baseDate : new Date(baseDate);
 
     for (let i = 0; i < count; i++) {
       const d = new Date(now);
@@ -250,6 +369,11 @@
       const dayOfWeek = d.getDay();
       const sched = BUSINESS_HOURS.schedule[dayOfWeek];
       const isClosed = Boolean(sched && sched.isClosed);
+      const isToday = i === 0;
+
+      const detailedSlots = getDetailedTimeSlots(dayOfWeek, isToday, durationMinutes, now);
+      const availableSlots = detailedSlots.filter(s => s.isAvailable);
+      const hasAvailableSlots = !isClosed && availableSlots.length > 0;
 
       days.push({
         dow: dowShort,
@@ -257,10 +381,13 @@
         month: monthShort,
         year: year,
         dayOfWeek: dayOfWeek,
-        isToday: i === 0,
+        isToday: isToday,
         isClosed: isClosed,
+        hasAvailableSlots: hasAvailableSlots,
+        availableSlotsCount: availableSlots.length,
         hoursLabel: sched ? sched.label : "Closed",
         slots: getTimeSlotsForDay(dayOfWeek),
+        detailedSlots: detailedSlots,
         fullFormatted: `${dowShort}, ${monthShort} ${dayNum}`
       });
     }
@@ -307,10 +434,19 @@
         return;
       }
 
+      let statusBadgeHtml = `<span class="pill ${shopStatus.badgeClass}" style="font-size:10.5px; padding:2px 8px;">${shopStatus.statusText}</span>`;
+      if (options.context === "staff" || options.isStaffView) {
+        if (!shopStatus.isOpen) {
+          statusBadgeHtml = `<span class="pill pill-accent" style="font-size:10.5px; padding:2px 8px; font-weight:700; background:rgba(255,90,31,0.18); color:#fb923c; border:1px solid rgba(255,90,31,0.4);">🌙 Night Shift / Active Labor</span>`;
+        } else {
+          statusBadgeHtml = `<span class="pill pill-good" style="font-size:10.5px; padding:2px 8px; font-weight:700; background:rgba(34,197,94,0.15); color:#86efac; border:1px solid rgba(34,197,94,0.35);">Open Floor (Active Shift)</span>`;
+        }
+      }
+
       if (options.compact) {
         el.innerHTML = `<span style="color:#fff; font-weight:700;">${timeStr}</span> <span style="opacity:0.75;">${geo.abbreviation}</span>`;
       } else {
-        el.innerHTML = `<span style="color:#fff; font-weight:700;">${timeStr} ${geo.abbreviation}</span> &bull; <span style="color:var(--text-secondary);">${geo.city}</span> &bull; <span style="opacity:0.8;">${dateStr}</span> &bull; <span class="pill ${shopStatus.badgeClass}" style="font-size:10.5px; padding:2px 8px;">${shopStatus.statusText}</span>`;
+        el.innerHTML = `<span style="color:#fff; font-weight:700;">${timeStr} ${geo.abbreviation}</span> • <span style="color:var(--text-secondary);">${geo.city}</span> • <span style="opacity:0.8;">${dateStr}</span> • ${statusBadgeHtml}`;
       }
     };
 
@@ -330,6 +466,9 @@
     getDynamicETA,
     getBookingDays,
     getTimeSlotsForDay,
+    parseTimeToMinutes,
+    getServiceDurationMinutes,
+    getDetailedTimeSlots,
     isShopOpen,
     BUSINESS_HOURS,
     bindLiveClock

@@ -77,55 +77,313 @@
 
   const SYMPTOM_DATABASE = {
     "brakes": {
-      title: "Front Brake Pads & Rotor Resurfacing",
-      urgency: "Urgency: Moderate",
-      parts: "$75.00 – $95.00",
-      labor: "$100.00 – $130.00",
-      total: "$175.00 – $225.00",
-      headline: "Squealing or Metallic Grinding Under Braking",
-      explanation: "A high-pitched screech indicates the built-in acoustic wear clip is touching the rotor. Should be serviced promptly before rotor gouging occurs."
+      name: "Brakes & Stopping",
+      symptoms: [
+        {
+          id: "brakes-squeal",
+          label: "🔊 Squealing / grinding under braking",
+          title: "Front Ceramic Brake Pads & Rotor Resurfacing",
+          urgency: "Urgency: Moderate",
+          parts: "$75.00 – $95.00",
+          labor: "$100.00 – $130.00",
+          total: "$175.00 – $225.00",
+          headline: "Squealing or Metallic Grinding Under Braking",
+          explanation: "A high-pitched screech indicates the built-in acoustic wear clip is touching the rotor. Should be serviced promptly before rotor gouging occurs."
+        },
+        {
+          id: "brakes-soft",
+          label: "🦶 Spongy / soft pedal sinking to floor",
+          title: "Brake Master Cylinder & Fluid Flush",
+          urgency: "Urgency: High",
+          parts: "$60.00 – $90.00",
+          labor: "$85.00 – $120.00",
+          total: "$145.00 – $210.00",
+          headline: "Spongy Brake Pedal or Extended Stopping Distance",
+          explanation: "Air in hydraulic brake lines or contaminated hygroscopic fluid reduces clamping pressure. Requires vacuum fluid evacuation & caliper bleed."
+        },
+        {
+          id: "brakes-vibration",
+          label: "〰️ Steering pulsation / shudder when stopping",
+          title: "Front Rotor Resurfacing & Hub Truing",
+          urgency: "Urgency: Moderate",
+          parts: "$80.00 – $120.00",
+          labor: "$110.00 – $140.00",
+          total: "$190.00 – $260.00",
+          headline: "Rotor Disc Thickness Variation / Warpage",
+          explanation: "Lateral runout or uneven brake pad friction material deposits create steering wheel vibration under highway deceleration."
+        },
+        {
+          id: "brakes-abs",
+          label: "⚠️ ABS warning light on cluster",
+          title: "ABS Wheel Speed Sensor & Tone Ring Service",
+          urgency: "Urgency: Moderate",
+          parts: "$45.00 – $75.00",
+          labor: "$75.00 – $110.00",
+          total: "$120.00 – $185.00",
+          headline: "Anti-lock Braking System Diagnostic & Sensor Swap",
+          explanation: "Faulty magnetic reluctance sensor or debris in tone ring preventing wheel speed synchronization during heavy emergency braking."
+        }
+      ]
     },
     "engine": {
-      title: "OBD-II Engine Diagnostic & Sensor Triage",
-      urgency: "Urgency: High",
-      parts: "$35.00 – $65.00",
-      labor: "$95.00 – $125.00",
-      total: "$130.00 – $190.00",
-      headline: "Check Engine Light / Misfire Code (P0300/P0420)",
-      explanation: "ECU triggered emission or combustion fault. Scan tool freeze frame analysis required to identify spark plug, ignition coil, or oxygen sensor failure."
+      name: "Engine & OBD-II Diagnostics",
+      symptoms: [
+        {
+          id: "engine-cel",
+          label: "⚠️ Check Engine Light (OBD-II Code)",
+          title: "OBD-II Engine Diagnostic & Sensor Triage",
+          urgency: "Urgency: High",
+          parts: "$35.00 – $65.00",
+          labor: "$95.00 – $125.00",
+          total: "$130.00 – $190.00",
+          headline: "Check Engine Light / Emission Control Fault",
+          explanation: "ECU triggered emission or combustion fault. Scan tool freeze frame analysis required to identify spark plug, ignition coil, or oxygen sensor failure."
+        },
+        {
+          id: "engine-misfire",
+          label: "⚡ Rough idle, engine stumble, or misfire",
+          title: "Iridium Spark Plugs & Ignition Coil Replacement",
+          urgency: "Urgency: High",
+          parts: "$65.00 – $110.00",
+          labor: "$95.00 – $130.00",
+          total: "$160.00 – $240.00",
+          headline: "Cylinder Combustion Misfire (P0301–P0304)",
+          explanation: "Fouled spark electrode or failing ignition coil primary winding creating unburned fuel mixture and rough engine idling."
+        },
+        {
+          id: "engine-overheat",
+          label: "🌡️ Temperature gauge high / coolant smell",
+          title: "Thermostat & Engine Cooling System Pressure Flush",
+          urgency: "Urgency: Immediate",
+          parts: "$45.00 – $80.00",
+          labor: "$105.00 – $140.00",
+          total: "$150.00 – $220.00",
+          headline: "Engine Overheating Risk & Coolant Flow Obstruction",
+          explanation: "Stuck thermostat valve or low coolant pressure risking cylinder head gasket failure. Immediate pressure test and flush advised."
+        },
+        {
+          id: "engine-smoke",
+          label: "💨 Exhaust smoke or burning oil odor",
+          title: "PCV Positive Crankcase Valve & Gasket Service",
+          urgency: "Urgency: Moderate",
+          parts: "$55.00 – $95.00",
+          labor: "$125.00 – $185.00",
+          total: "$180.00 – $280.00",
+          headline: "Crankcase Pressure / Valve Cover Gasket Weepage",
+          explanation: "Restricted PCV system forcing oil seepage past valve cover gaskets or into intake manifold plenum."
+        }
+      ]
     },
     "climate": {
-      title: "AC System Vacuum & Freon Recharge",
-      urgency: "Urgency: Low",
-      parts: "$50.00 – $80.00",
-      labor: "$90.00 – $120.00",
-      total: "$140.00 – $200.00",
-      headline: "AC Blowing Warm or Humidity in Cabin",
-      explanation: "Refrigerant pressure is below optimal threshold or cabin filter is obstructed. System requires evacuation, UV dye test, and recharge."
+      name: "AC & Climate Control",
+      symptoms: [
+        {
+          id: "climate-warm",
+          label: "❄️ AC blowing warm or weak airflow",
+          title: "AC System Vacuum & Freon Recharge",
+          urgency: "Urgency: Low",
+          parts: "$50.00 – $80.00",
+          labor: "$90.00 – $120.00",
+          total: "$140.00 – $200.00",
+          headline: "AC Blowing Warm or Humidity in Cabin",
+          explanation: "Refrigerant pressure is below optimal threshold or cabin filter is obstructed. System requires evacuation, UV dye test, and recharge."
+        },
+        {
+          id: "climate-smell",
+          label: "🦨 Musty, moldy odor when fan turns on",
+          title: "HEPA Cabin Micro-Filter & Evaporator Sanitization",
+          urgency: "Urgency: Low",
+          parts: "$25.00 – $40.00",
+          labor: "$50.00 – $70.00",
+          total: "$75.00 – $110.00",
+          headline: "Cabin Evaporator Core Microbial Decontamination",
+          explanation: "Condensation buildup on evaporator coil breeds mildew. Replace electrostatic micro-filter and sanitize HVAC duct passages."
+        },
+        {
+          id: "climate-noise",
+          label: "🔊 Clicking noise behind dash when changing temp",
+          title: "HVAC Blend Door Actuator Motor Replacement",
+          urgency: "Urgency: Low",
+          parts: "$65.00 – $95.00",
+          labor: "$100.00 – $140.00",
+          total: "$165.00 – $235.00",
+          headline: "Blend Door Gear Stripping / Air Flap Fault",
+          explanation: "Internal plastic stepper gears stripped, preventing smooth hot/cold air mixture transition."
+        },
+        {
+          id: "climate-no-heat",
+          label: "🥶 Heater blowing cold air during winter",
+          title: "Heater Core Chemical Flush & Air Bleed",
+          urgency: "Urgency: Moderate",
+          parts: "$35.00 – $55.00",
+          labor: "$100.00 – $140.00",
+          total: "$135.00 – $195.00",
+          headline: "Heater Core Sediment Obstruction",
+          explanation: "Mineral sediment restricting coolant circulation through cabin heat exchanger core."
+        }
+      ]
     },
     "suspension": {
-      title: "Four-Wheel Alignment & Strut Inspection",
-      urgency: "Urgency: Moderate",
-      parts: "$25.00 – $45.00",
-      labor: "$100.00 – $135.00",
-      total: "$125.00 – $180.00",
-      headline: "Steering Pulling or Shaking Over 50 MPH",
-      explanation: "Camber/toe alignment drift or tire wheel weight imbalance. Alignment machine calibration required to prevent uneven tire tread wear."
+      name: "Suspension & Steering",
+      symptoms: [
+        {
+          id: "susp-shake",
+          label: "〰️ Steering shakes / vibrates above 50 MPH",
+          title: "Road-Force Wheel Balance & Tire Scan",
+          urgency: "Urgency: Moderate",
+          parts: "$20.00 – $40.00",
+          labor: "$60.00 – $90.00",
+          total: "$80.00 – $130.00",
+          headline: "High-Speed Dynamic Wheel Imbalance",
+          explanation: "Weight distribution variance around wheel circumference causing harmonic vibration through steering rack."
+        },
+        {
+          id: "susp-pull",
+          label: "🚗 Car drifts or pulls to one side",
+          title: "Precision 4-Wheel Computerized Alignment",
+          urgency: "Urgency: Moderate",
+          parts: "$10.00 – $25.00",
+          labor: "$100.00 – $135.00",
+          total: "$110.00 – $160.00",
+          headline: "Camber, Caster & Toe Angle Geometric Drift",
+          explanation: "Pothole impacts knocked wheel angles out of factory tolerances, accelerating uneven shoulder tire wear."
+        },
+        {
+          id: "susp-clunk",
+          label: "💥 Clunking or knocking over bumps",
+          title: "Sway Bar End Links & Bushings Replacement",
+          urgency: "Urgency: Moderate",
+          parts: "$40.00 – $70.00",
+          labor: "$100.00 – $140.00",
+          total: "$140.00 – $210.00",
+          headline: "Stabilizer Link Ball Joint Play & Bushing Wear",
+          explanation: "Ball socket play in stabilizer bar links allows metal-to-metal rattling during suspension compression."
+        },
+        {
+          id: "susp-bounce",
+          label: "🦘 Excessive bouncing or nose-dive on stops",
+          title: "Front Strut Assemblies & Coil Springs",
+          urgency: "Urgency: Moderate",
+          parts: "$140.00 – $220.00",
+          labor: "$150.00 – $200.00",
+          total: "$290.00 – $420.00",
+          headline: "Hydraulic Shock Absorber Gas/Oil Seal Depletion",
+          explanation: "Damping valves unable to arrest spring oscillations, compromising emergency braking stability."
+        }
+      ]
     },
     "battery": {
-      title: "Battery Cold Cranking Amp Test & Replacement",
-      urgency: "Urgency: Immediate",
-      parts: "$140.00 – $185.00",
-      labor: "$25.00 – $45.00",
-      total: "$165.00 – $230.00",
-      headline: "Slow Engine Crank or Battery Warning Light",
-      explanation: "Alternator charging voltage or battery internal resistance out of spec. 12V test indicates declining reserve capacity."
+      name: "Battery & Electrical",
+      symptoms: [
+        {
+          id: "batt-crank",
+          label: "🔋 Slow engine crank or single click on start",
+          title: "AGM / Flooded 12V Battery Replacement & CCA Test",
+          urgency: "Urgency: Immediate",
+          parts: "$140.00 – $185.00",
+          labor: "$25.00 – $45.00",
+          total: "$165.00 – $230.00",
+          headline: "Declining Reserve Capacity & Cold Cranking Amps",
+          explanation: "Lead plate sulfation or cell degradation prevents delivery of required amperage to starter motor."
+        },
+        {
+          id: "batt-light",
+          label: "🔴 Red battery light glowing on dashboard",
+          title: "Alternator Charging Output & Voltage Regulator Test",
+          urgency: "Urgency: Immediate",
+          parts: "$130.00 – $210.00",
+          labor: "$80.00 – $100.00",
+          total: "$210.00 – $310.00",
+          headline: "Alternator Diode Trio / Stator Charging Loss",
+          explanation: "Charging system output below 13.5V, operating solely on battery reserve until total electrical stall."
+        },
+        {
+          id: "batt-drain",
+          label: "🔌 Battery dies after parking overnight",
+          title: "Parasitic Draw Multimeter Circuit Triage",
+          urgency: "Urgency: Moderate",
+          parts: "$15.00 – $35.00",
+          labor: "$80.00 – $115.00",
+          total: "$95.00 – $150.00",
+          headline: "Key-Off Excessive Milliamp Current Draw",
+          explanation: "Body control module or aftermarket accessory failing to enter sleep mode, depleting 12V state of charge."
+        },
+        {
+          id: "batt-corrosion",
+          label: "🧪 White / bluish crust on battery terminals",
+          title: "Terminal Post Chemical De-Oxidation & Sealant",
+          urgency: "Urgency: Low",
+          parts: "$10.00 – $20.00",
+          labor: "$35.00 – $55.00",
+          total: "$45.00 – $75.00",
+          headline: "Acid Vapor Oxidation / High Resistance Joint",
+          explanation: "Electrolyte gas venting causing voltage drop across terminal clamps. Requires neutralizing scrub and anti-corrosive felt washers."
+        }
+      ]
+    }
+  };
+
+  const OBD_CODES_DATABASE = {
+    "P0420": {
+      title: "Catalytic Converter System Efficiency Below Threshold (Bank 1)",
+      service: "Downstream O2 Sensor & Catalytic Converter Diagnostic",
+      parts: "$65.00 – $180.00",
+      labor: "$95.00 – $130.00",
+      total: "$160.00 – $310.00",
+      urgency: "Urgency: Moderate",
+      explanation: "Post-catalytic oxygen sensor signal matches pre-cat sensor, indicating degradation of catalyst washcoat or exhaust manifold gasket leak."
+    },
+    "P0300": {
+      title: "Random / Multiple Cylinder Misfire Detected",
+      service: "Ignition Coil Pack, Spark Plug & Fuel Trim Diagnostic",
+      parts: "$70.00 – $140.00",
+      labor: "$95.00 – $135.00",
+      total: "$165.00 – $275.00",
+      urgency: "Urgency: High",
+      explanation: "Crankshaft position sensor detected uneven acceleration pulses across multiple cylinders. Fuel pressure and spark delivery test recommended."
+    },
+    "P0171": {
+      title: "System Too Lean (Bank 1)",
+      service: "MAF Sensor Clean, Vacuum Smoke Test & Fuel Filter",
+      parts: "$35.00 – $75.00",
+      labor: "$90.00 – $125.00",
+      total: "$125.00 – $200.00",
+      urgency: "Urgency: Moderate",
+      explanation: "Excess unmetered air entering engine or weak fuel pump delivery. EVAP smoke test pinpoints intake boot cracks or vacuum line leaks."
+    },
+    "P0455": {
+      title: "EVAP System Gross Leak Detected",
+      service: "EVAP Purge Valve & Gas Cap Seal Replacement",
+      parts: "$25.00 – $65.00",
+      labor: "$75.00 – $105.00",
+      total: "$100.00 – $170.00",
+      urgency: "Urgency: Low",
+      explanation: "Fuel tank vapor recovery system cannot maintain vacuum pressure. Often caused by loose gas cap or stuck EVAP vapor canister purge solenoid."
+    },
+    "P0128": {
+      title: "Coolant Thermostat (Coolant Temp Below Regulating Temp)",
+      service: "Engine Thermostat & Coolant Temp Sensor Replacement",
+      parts: "$40.00 – $75.00",
+      labor: "$100.00 – $135.00",
+      total: "$140.00 – $210.00",
+      urgency: "Urgency: Moderate",
+      explanation: "Thermostat valve stuck open, preventing engine from reaching optimal closed-loop operating temperature and lowering MPG."
     }
   };
 
   // ==========================================
   // APPLICATION STATE DEFAULTS
   // ==========================================
+  const DEMO_VEHICLE = {
+    id: "demo-crv-2025",
+    title: "2025 Honda CR-V Hybrid",
+    plate: "EOGA45",
+    vin: "1HGCR2F85MA09281",
+    miles: "55,000",
+    health: "Certified Good",
+    isDemo: true
+  };
+
   const DEFAULT_GUEST_USER = {
     name: "Guest Driver",
     email: "guest@torqueandco.com",
@@ -231,6 +489,7 @@
 
     // Trigger render logic
     if (screenId === "home") renderHome();
+    if (screenId === "diagnostics") renderDiagnostics();
     if (screenId === "book") renderBooking();
     if (screenId === "progress") renderProgress();
     if (screenId === "estimate") renderEstimate();
@@ -267,21 +526,42 @@
   // RENDER: HOME & GARAGE COCKPIT
   // ==========================================
   function renderHome() {
-    const activeVeh = (state.activeVehicleIndex >= 0 && state.vehicles[state.activeVehicleIndex]) ? state.vehicles[state.activeVehicleIndex] : null;
+    const hasCustomVehicles = state.vehicles && state.vehicles.length > 0;
+    const activeVeh = (hasCustomVehicles && state.activeVehicleIndex >= 0 && state.vehicles[state.activeVehicleIndex])
+      ? state.vehicles[state.activeVehicleIndex]
+      : (state.isAuthenticated ? null : DEMO_VEHICLE);
+
     const navVin = document.getElementById("nav-veh-vin");
     const navName = document.getElementById("nav-veh-name");
     const dashTitle = document.getElementById("dash-veh-title");
     const dashVin = document.getElementById("dash-veh-vin");
     const dashPill = document.getElementById("dash-veh-status-pill");
+    const dashDemoTag = document.getElementById("dash-demo-tag");
 
     if (activeVeh) {
       const vinStr = activeVeh.vin || activeVeh.plate || "Registered Vehicle";
       const displayVin = vinStr.startsWith("PLATE:") ? vinStr : (vinStr.length > 14 ? `VIN: ${vinStr.slice(0, 12)}...` : `Plate: ${vinStr}`);
 
-      if (navName) navName.textContent = activeVeh.title;
-      if (navVin) navVin.textContent = activeVeh.plate ? `Plate: ${activeVeh.plate}` : displayVin;
-      if (dashTitle) dashTitle.textContent = activeVeh.title;
-      if (dashVin) dashVin.textContent = `${activeVeh.plate ? 'Plate: ' + activeVeh.plate : displayVin} • ${activeVeh.miles || 0} miles`;
+      if (activeVeh.isDemo) {
+        if (navName) navName.textContent = "2025 Honda CR-V (Demo)";
+        if (navVin) navVin.textContent = "Plate: EOGA45 • Demo Preview";
+        if (dashTitle) dashTitle.textContent = activeVeh.title;
+        if (dashVin) {
+          dashVin.innerHTML = `Plate: ${activeVeh.plate} &bull; ${activeVeh.miles} miles &bull; <button type="button" class="btn-link" id="dash-signin-link" style="color:var(--accent); text-decoration:underline; background:none; border:none; cursor:pointer; font-weight:600; padding:0; font-size:12px;">Sign In to load your vehicle</button>`;
+          const dashSignInBtn = document.getElementById("dash-signin-link");
+          if (dashSignInBtn) {
+            dashSignInBtn.addEventListener("click", () => openAuthModal("signin"));
+          }
+        }
+        if (dashDemoTag) dashDemoTag.style.display = "inline-flex";
+      } else {
+        if (navName) navName.textContent = activeVeh.title;
+        if (navVin) navVin.textContent = activeVeh.plate ? `Plate: ${activeVeh.plate}` : displayVin;
+        if (dashTitle) dashTitle.textContent = activeVeh.title;
+        if (dashVin) dashVin.textContent = `${activeVeh.plate ? 'Plate: ' + activeVeh.plate : displayVin} • ${activeVeh.miles || 0} miles`;
+        if (dashDemoTag) dashDemoTag.style.display = "none";
+      }
+
       if (dashPill) {
         dashPill.style.display = "inline-flex";
         dashPill.textContent = "● " + (activeVeh.health || "Certified Good");
@@ -291,6 +571,7 @@
       if (navVin) navVin.textContent = "Click to choose or add";
       if (dashTitle) dashTitle.textContent = "No Vehicle Selected";
       if (dashVin) dashVin.textContent = "Add your car or sign in to load your saved garage";
+      if (dashDemoTag) dashDemoTag.style.display = "none";
       if (dashPill) {
         dashPill.style.display = "none";
       }
@@ -348,12 +629,97 @@
   }
 
   // ==========================================
+  // RENDER: SYMPTOM & OBD-II DIAGNOSER
+  // ==========================================
+  let currentActiveSystem = "brakes";
+  let currentActiveSymptomId = null;
+
+  function renderDiagnostics(systemKey = currentActiveSystem, symptomId = null) {
+    currentActiveSystem = systemKey;
+    const sysData = SYMPTOM_DATABASE[systemKey] || SYMPTOM_DATABASE["brakes"];
+    const subList = document.getElementById("diag-sub-symptoms-list");
+    const countEl = document.getElementById("sub-symptom-count");
+    const catTitle = document.getElementById("diag-cat-title");
+    const vehContextName = document.getElementById("diag-context-veh-name");
+
+    // Vehicle Context Badge
+    const hasCustomVehicles = state.vehicles && state.vehicles.length > 0;
+    const activeVeh = (hasCustomVehicles && state.activeVehicleIndex >= 0 && state.vehicles[state.activeVehicleIndex])
+      ? state.vehicles[state.activeVehicleIndex]
+      : (state.isAuthenticated ? null : DEMO_VEHICLE);
+
+    if (vehContextName) {
+      vehContextName.textContent = activeVeh ? activeVeh.title : "Standard Passenger Vehicle";
+    }
+
+    if (catTitle) catTitle.textContent = `${sysData.name} Analysis`;
+    if (countEl) countEl.textContent = `${sysData.symptoms.length} specific issues identified`;
+
+    const activeSymptom = symptomId
+      ? sysData.symptoms.find(s => s.id === symptomId) || sysData.symptoms[0]
+      : sysData.symptoms[0];
+    currentActiveSymptomId = activeSymptom.id;
+
+    // Update active system tabs
+    document.querySelectorAll(".system-tab-btn").forEach(btn => {
+      if (btn.getAttribute("data-system") === systemKey) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+
+    // Populate sub-symptom selector chips
+    if (subList) {
+      subList.innerHTML = sysData.symptoms.map(s => `
+        <div class="sub-symptom-chip ${s.id === activeSymptom.id ? 'active' : ''}" data-symptom-id="${s.id}">
+          <span>${s.label}</span>
+          <span class="font-mono" style="font-size:11.5px; color:var(--text-muted);">${s.total.split("–")[0]}...</span>
+        </div>
+      `).join("");
+
+      subList.querySelectorAll(".sub-symptom-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const sId = chip.getAttribute("data-symptom-id");
+          renderDiagnostics(systemKey, sId);
+        });
+      });
+    }
+
+    // Populate Detail Card
+    const headline = document.getElementById("diag-headline");
+    const explanation = document.getElementById("diag-explanation");
+    const serviceName = document.getElementById("diag-service-name");
+    const parts = document.getElementById("diag-parts");
+    const labor = document.getElementById("diag-labor");
+    const total = document.getElementById("diag-total");
+
+    if (headline) headline.textContent = activeSymptom.headline;
+    if (explanation) explanation.textContent = activeSymptom.explanation;
+    if (serviceName) serviceName.textContent = activeSymptom.title;
+    if (parts) parts.textContent = activeSymptom.parts;
+    if (labor) labor.textContent = activeSymptom.labor;
+    if (total) total.textContent = activeSymptom.total;
+  }
+
+  // ==========================================
   // RENDER: BOOKING FLOW
   // ==========================================
   function calculateBookingTotal() {
     return state.booking.selectedServices.reduce((sum, id) => {
       const s = SERVICES.find(x => x.id === id);
       return sum + (s ? s.price : 0);
+    }, 0);
+  }
+
+  function calculateBookingDurationMinutes() {
+    if (!state.booking.selectedServices.length) return 0;
+    return state.booking.selectedServices.reduce((sum, id) => {
+      const s = SERVICES.find(x => x.id === id);
+      const durMin = (window.GeoTime && window.GeoTime.getServiceDurationMinutes)
+        ? window.GeoTime.getServiceDurationMinutes(s ? s.duration : "45 mins")
+        : 45;
+      return sum + durMin;
     }, 0);
   }
 
@@ -408,8 +774,25 @@
 
     // Selected count & Total Preview
     const total = calculateBookingTotal();
-    document.getElementById("book-selected-count").textContent = `${state.booking.selectedServices.length} Selected`;
-    document.getElementById("book-total-preview").textContent = `$${total.toFixed(2)}`;
+    const totalDurationMin = calculateBookingDurationMinutes();
+
+    const countEl = document.getElementById("book-selected-count");
+    if (countEl) countEl.textContent = `${state.booking.selectedServices.length} Selected`;
+
+    const totalPrevEl = document.getElementById("book-total-preview");
+    if (totalPrevEl) totalPrevEl.textContent = `$${total.toFixed(2)}`;
+
+    // Update cumulative duration indicator pill
+    const durationPill = document.getElementById("book-duration-pill");
+    if (durationPill) {
+      if (state.booking.selectedServices.length > 0) {
+        durationPill.style.display = "inline-flex";
+        const durHours = (totalDurationMin / 60).toFixed(1).replace(/\.0$/, "");
+        durationPill.textContent = `⏱️ Est. Service Time: ${durHours} hr${durHours === '1' ? '' : 's'} (${totalDurationMin}m)`;
+      } else {
+        durationPill.style.display = "none";
+      }
+    }
 
     // Update timezone indicator badge
     const tzBadge = document.getElementById("book-tz-badge");
@@ -418,27 +801,41 @@
       tzBadge.textContent = `Timezone: ${geo.city} (${geo.abbreviation})`;
     }
 
-    // Dates (Next 7 days dynamically generated from user's local calendar)
-    const dateContainer = document.getElementById("book-date-row");
-    if (dateContainer) {
-      const dates = (window.GeoTime && window.GeoTime.getBookingDays) ? window.GeoTime.getBookingDays(7) : [];
-      
-      // If current booking date is missing or closed, select first open day
-      if (!state.booking.date || state.booking.date.isClosed) {
-        const firstOpen = dates.find(d => !d.isClosed) || dates[0];
-        if (firstOpen) {
-          state.booking.date = firstOpen;
-        }
-      }
+    // Dates (Next 7 days dynamically generated from user's local calendar considering service duration)
+    const effectiveDuration = totalDurationMin > 0 ? totalDurationMin : 45;
+    const dates = (window.GeoTime && window.GeoTime.getBookingDays)
+      ? window.GeoTime.getBookingDays(7, effectiveDuration)
+      : [];
 
+    // Same-day edge case: If current booking date is missing, closed, or today has no available slots left (past or closed),
+    // automatically roll over to the first open day that has available slots!
+    if (!state.booking.date || state.booking.date.isClosed || (state.booking.date.isToday && !state.booking.date.hasAvailableSlots)) {
+      const firstAvailable = dates.find(d => !d.isClosed && d.hasAvailableSlots) || dates.find(d => !d.isClosed) || dates[0];
+      if (firstAvailable) {
+        state.booking.date = firstAvailable;
+      }
+    }
+
+    const dateContainer = document.getElementById("book-date-row");
+    if (dateContainer && dates.length > 0) {
       dateContainer.innerHTML = dates.map((d, idx) => {
         const isSel = state.booking.date && (d.num === state.booking.date.num && d.month === state.booking.date.month);
-        const closedStyle = d.isClosed ? 'style="opacity:0.45; cursor:not-allowed;" title="Closed on Sundays"' : '';
+        let subText = d.month;
+        let closedStyle = "";
+
+        if (d.isClosed) {
+          subText = "Closed";
+          closedStyle = 'style="opacity:0.42; cursor:not-allowed;" title="Closed on Sundays"';
+        } else if (d.isToday && !d.hasAvailableSlots) {
+          subText = "Past Hours";
+          closedStyle = 'style="opacity:0.55; cursor:pointer;" title="All slots for today have passed or shop is closed"';
+        }
+
         return `
           <div class="date-pill-btn ${isSel ? 'selected' : ''}" data-idx="${idx}" ${closedStyle}>
             <span style="font-size:11px; text-transform:uppercase;">${d.isToday ? 'Today' : d.dow}</span>
             <span class="font-mono" style="font-size:18px; font-weight:700;">${d.num}</span>
-            <span style="font-size:10px; opacity:0.8;">${d.isClosed ? 'Closed' : d.month}</span>
+            <span style="font-size:10px; opacity:0.85;">${subText}</span>
           </div>
         `;
       }).join("");
@@ -450,42 +847,100 @@
             showToast("Habesha Auto is closed on Sundays. Please choose Monday through Saturday.", "warning");
             return;
           }
-          state.booking.date = selectedDay;
-          const validSlots = selectedDay.slots && selectedDay.slots.length ? selectedDay.slots : ["8:00 AM", "10:00 AM", "1:00 PM", "3:00 PM"];
-          if (!validSlots.includes(state.booking.time)) {
-            state.booking.time = validSlots[0] || "8:00 AM";
+          if (selectedDay.isToday && !selectedDay.hasAvailableSlots) {
+            showToast("All appointments for today have passed. Please choose an upcoming day.", "warning");
           }
+          state.booking.date = selectedDay;
           renderBooking();
         });
       });
     }
 
-    // Time Slots for the selected date
+    // Time Slots for the selected date with multi-service stacking and past slot filtering
     const timeContainer = document.getElementById("book-time-grid");
     if (timeContainer) {
-      const activeSlots = (state.booking.date && state.booking.date.slots) 
-        ? state.booking.date.slots 
-        : (window.GeoTime ? window.GeoTime.getTimeSlotsForDay(state.booking.date ? state.booking.date.dayOfWeek : 1) : ["8:00 AM", "10:00 AM", "1:00 PM", "3:00 PM"]);
+      const selectedDay = state.booking.date || dates[0];
 
-      if (!activeSlots || activeSlots.length === 0) {
+      if (!selectedDay || selectedDay.isClosed) {
         timeContainer.innerHTML = `
-          <div style="grid-column: 1 / -1; padding:16px; text-align:center; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; color:#fca5a5;">
-            ⚠️ Facility is closed on this day. Please choose a Monday through Saturday slot.
+          <div style="grid-column: 1 / -1; padding:16px; text-align:center; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; color:#fca5a5; font-size:13px;">
+            ⚠️ Habesha Auto is closed on Sundays. Please choose a Monday through Saturday appointment.
           </div>
         `;
       } else {
-        timeContainer.innerHTML = activeSlots.map(t => `
-          <div class="time-slot-btn ${t === state.booking.time ? 'selected' : ''}" data-time="${t}">
-            ${t}
-          </div>
-        `).join("");
+        const detailedSlots = (window.GeoTime && window.GeoTime.getDetailedTimeSlots)
+          ? window.GeoTime.getDetailedTimeSlots(selectedDay.dayOfWeek, selectedDay.isToday, effectiveDuration)
+          : (selectedDay.slots || []).map(t => ({ time: t, isAvailable: true, reason: "" }));
 
-        timeContainer.querySelectorAll(".time-slot-btn").forEach(btn => {
-          btn.addEventListener("click", () => {
-            state.booking.time = btn.getAttribute("data-time");
-            renderBooking();
+        const availableList = detailedSlots.filter(s => s.isAvailable);
+
+        // Ensure state.booking.time is currently available
+        const isCurrentTimeAvailable = availableList.some(s => s.time === state.booking.time);
+        if (!isCurrentTimeAvailable && availableList.length > 0) {
+          state.booking.time = availableList[0].time;
+        } else if (availableList.length === 0) {
+          state.booking.time = null;
+        }
+
+        if (detailedSlots.length === 0 || availableList.length === 0) {
+          const reasonText = selectedDay.isToday
+            ? "All service windows for today are closed or in the past. Please select tomorrow or an upcoming date above."
+            : `Selected services (${(effectiveDuration/60).toFixed(1)} hrs) exceed operating hours on this date.`;
+          timeContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; padding:16px; text-align:center; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:8px; color:#fde68a; font-size:13px; line-height:1.5;">
+              ⏱️ ${reasonText}
+            </div>
+          `;
+        } else {
+          timeContainer.innerHTML = detailedSlots.map(s => {
+            const isSel = s.time === state.booking.time && s.isAvailable;
+            if (!s.isAvailable) {
+              return `
+                <div class="time-slot-btn disabled" title="${s.reason || 'Unavailable'}">
+                  <span class="slot-time-text">${s.time}</span>
+                  <span class="slot-cutoff-hint">${s.reason || 'Unavailable'}</span>
+                </div>
+              `;
+            }
+            return `
+              <div class="time-slot-btn ${isSel ? 'selected' : ''}" data-time="${s.time}">
+                <span class="slot-time-text">${s.time}</span>
+              </div>
+            `;
+          }).join("");
+
+          timeContainer.querySelectorAll(".time-slot-btn:not(.disabled)").forEach(btn => {
+            btn.addEventListener("click", () => {
+              state.booking.time = btn.getAttribute("data-time");
+              renderBooking();
+            });
           });
-        });
+        }
+      }
+    }
+
+    // Validation & CTA Button State
+    const confirmBtn = document.getElementById("confirm-booking-btn");
+    if (confirmBtn) {
+      const hasServices = state.booking.selectedServices.length > 0;
+      const hasValidSlot = Boolean(state.booking.time);
+      const isClosed = Boolean(state.booking.date && state.booking.date.isClosed);
+
+      if (!hasServices) {
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = "0.5";
+        confirmBtn.style.cursor = "not-allowed";
+        confirmBtn.textContent = "Select a Service to Continue →";
+      } else if (isClosed || !hasValidSlot) {
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = "0.5";
+        confirmBtn.style.cursor = "not-allowed";
+        confirmBtn.textContent = "Select an Available Arrival Slot →";
+      } else {
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = "1";
+        confirmBtn.style.cursor = "pointer";
+        confirmBtn.textContent = `Confirm Appointment ($${total.toFixed(2)}) →`;
       }
     }
   }
@@ -585,8 +1040,9 @@
       `;
     }).join("");
 
-    const base = calculateBookingTotal() || (appt ? appt.total : 89.00);
-    const extra = state.progress.findingApproved ? state.progress.findingPrice : 0;
+    const bookingTotal = calculateBookingTotal();
+    const base = bookingTotal > 0 ? bookingTotal : (state.appointment ? (state.appointment.total || 134.00) : 134.00);
+    const extra = state.progress.findingPrice ? state.progress.findingPrice : 0;
     const finalTotal = base + extra;
     document.getElementById("prog-total-display").textContent = `$${finalTotal.toFixed(2)}`;
 
@@ -599,32 +1055,106 @@
       overall.className = "pill pill-good";
       overall.textContent = `In Progress (${pct}%)`;
     }
+
+    // Dynamic Payment Call-to-Action Lock (Active labor Steps 1-4 disabled, Step 5 unlocks payment)
+    const payBtn = document.getElementById("prog-pay-early-btn");
+    const isReadyForPayment = state.progress.stepIndex >= currentSteps.length - 1;
+    if (payBtn) {
+      if (isReadyForPayment) {
+        payBtn.disabled = false;
+        payBtn.classList.remove("btn-outline", "disabled");
+        payBtn.classList.add("btn-success");
+        payBtn.style.opacity = "1";
+        payBtn.style.cursor = "pointer";
+        payBtn.innerHTML = `Proceed to Payment ($${finalTotal.toFixed(2)}) &rarr;`;
+      } else {
+        payBtn.disabled = true;
+        payBtn.classList.remove("btn-success");
+        payBtn.classList.add("btn-outline");
+        payBtn.style.opacity = "0.5";
+        payBtn.style.cursor = "not-allowed";
+        payBtn.innerHTML = `🔒 Payment Upon Completion (Step 5)`;
+      }
+    }
+
+    // Dynamic "Review Findings" Visibility & Pulse Alert
+    const reviewBtn = document.getElementById("btn-review-findings");
+    if (reviewBtn) {
+      if (state.progress.findingApproved === null) {
+        reviewBtn.classList.add("btn-pulse-alert");
+        reviewBtn.innerHTML = `⚠️ Review Findings <span class="pill pill-warning" style="font-size:10px; padding:2px 6px; margin-left:4px;">1 Action Required</span>`;
+      } else {
+        reviewBtn.classList.remove("btn-pulse-alert");
+        reviewBtn.innerHTML = `Review Findings`;
+      }
+    }
   }
 
   // ==========================================
   // RENDER: ESTIMATE APPROVAL
   // ==========================================
   function renderEstimate() {
-    const base = calculateBookingTotal();
-    const extra = state.progress.findingPrice;
+    const bookingTotal = calculateBookingTotal();
+    const base = bookingTotal > 0 ? bookingTotal : (state.appointment ? (state.appointment.total || 134.00) : 134.00);
+    const extra = state.progress.findingPrice || 96.00;
     const decisionDiv = document.getElementById("estimate-decision-status");
     const actionsDiv = document.getElementById("estimate-action-buttons");
     const totalEl = document.getElementById("estimate-recalculated-total");
 
     if (state.progress.findingApproved === true) {
-      totalEl.textContent = `$${(base + extra).toFixed(2)}`;
-      actionsDiv.style.display = "none";
-      decisionDiv.style.display = "block";
-      decisionDiv.innerHTML = `<span class="pill pill-success" style="font-size:14px; padding:8px 16px;">✅ Approved by you ($96.00 added to invoice)</span>`;
+      if (totalEl) totalEl.textContent = `$${(base + extra).toFixed(2)}`;
+      if (actionsDiv) actionsDiv.style.display = "none";
+      if (decisionDiv) {
+        decisionDiv.style.display = "block";
+        decisionDiv.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+            <span class="pill pill-success" style="font-size:14px; padding:8px 16px;">
+              ✅ Approved by you ($96.00 added to repair authorization)
+            </span>
+            <button type="button" class="btn btn-link btn-sm" id="btn-re-evaluate-finding" style="color:var(--text-muted); text-decoration:underline; font-size:12.5px; background:none; border:none; cursor:pointer;">
+              🔄 Change Decision &bull; Decline &amp; Defer to Next Visit
+            </button>
+          </div>
+        `;
+        const reEvalBtn = document.getElementById("btn-re-evaluate-finding");
+        if (reEvalBtn) {
+          reEvalBtn.addEventListener("click", () => {
+            state.progress.findingApproved = false;
+            renderEstimate();
+            renderProgress();
+            showToast("Updated: Finding declined and deferred to next visit.", "info");
+          });
+        }
+      }
     } else if (state.progress.findingApproved === false) {
-      totalEl.textContent = `$${base.toFixed(2)}`;
-      actionsDiv.style.display = "none";
-      decisionDiv.style.display = "block";
-      decisionDiv.innerHTML = `<span class="pill pill-warning" style="font-size:14px; padding:8px 16px;">⚠️ Declined & deferred to next service</span>`;
+      if (totalEl) totalEl.textContent = `$${base.toFixed(2)}`;
+      if (actionsDiv) actionsDiv.style.display = "none";
+      if (decisionDiv) {
+        decisionDiv.style.display = "block";
+        decisionDiv.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:10px; align-items:center;">
+            <span class="pill pill-warning" style="font-size:14px; padding:8px 16px;">
+              ⚠️ Declined &amp; deferred to next service
+            </span>
+            <button type="button" class="btn btn-link btn-sm" id="btn-re-evaluate-finding" style="color:var(--accent); text-decoration:underline; font-size:12.5px; background:none; border:none; cursor:pointer; font-weight:600;">
+              🔄 Change Mind &bull; Approve This Repair (+$96.00)
+            </button>
+          </div>
+        `;
+        const reEvalBtn = document.getElementById("btn-re-evaluate-finding");
+        if (reEvalBtn) {
+          reEvalBtn.addEventListener("click", () => {
+            state.progress.findingApproved = true;
+            renderEstimate();
+            renderProgress();
+            showToast("Updated: Serpentine Belt repair approved ($96.00 added).", "success");
+          });
+        }
+      }
     } else {
-      totalEl.textContent = `$${base.toFixed(2)} (or $${(base + extra).toFixed(2)} if approved)`;
-      actionsDiv.style.display = "flex";
-      decisionDiv.style.display = "none";
+      if (totalEl) totalEl.textContent = `$${base.toFixed(2)} (or $${(base + extra).toFixed(2)} if approved)`;
+      if (actionsDiv) actionsDiv.style.display = "flex";
+      if (decisionDiv) decisionDiv.style.display = "none";
     }
   }
 
@@ -730,7 +1260,7 @@
   }
 
   // ==========================================
-  // RENDER: 24/7 SMART KEY LOCKER (DROP-OFF & PICKUP)
+  // RENDER: SMART KEY LOCKER (DROP-OFF & PICKUP)
   // ==========================================
   function renderKeyLocker() {
     const isPickup = Boolean(state.payment && state.payment.isPaid);
@@ -741,23 +1271,23 @@
 
     if (isPickup) {
       if (eyebrowEl) eyebrowEl.textContent = "Contactless Vehicle Pickup";
-      if (titleEl) titleEl.textContent = "24/7 Smart Key Pickup Locker";
+      if (titleEl) titleEl.textContent = "Smart Key Pickup Locker";
       if (badgeEl) {
         badgeEl.textContent = "Vehicle Ready in Slot A-4 • Key in Compartment #14";
         badgeEl.className = "pill pill-good";
       }
       if (descEl) {
-        descEl.innerHTML = "Your service invoice is paid! Scan this QR code or type <strong>8492</strong> on the illuminated electronic locker box next to Bay 1 to unlock compartment <strong>#14</strong> and retrieve your key fob for after-hours pickup.";
+        descEl.innerHTML = "Your service invoice is paid! Scan this QR code or type <strong>8492</strong> on the illuminated electronic locker box next to Bay 1 to unlock compartment <strong>#14</strong> and retrieve your key fob for pickup.";
       }
     } else {
       if (eyebrowEl) eyebrowEl.textContent = "Contactless Shop Access";
-      if (titleEl) titleEl.textContent = "24/7 Smart Key Drop-Off Locker";
+      if (titleEl) titleEl.textContent = "Smart Key Drop-Off Locker";
       if (badgeEl) {
         badgeEl.textContent = "Locker Compartment #14 Assigned";
         badgeEl.className = "pill pill-good";
       }
       if (descEl) {
-        descEl.innerHTML = "Scan this QR code or type <strong>8492</strong> on the illuminated electronic locker box next to Bay 1. Place your key fob inside and close the door.";
+        descEl.innerHTML = "Scan this QR code or type <strong>8492</strong> on the illuminated electronic locker box next to Bay 1. Place your key fob inside and close the door during official shop hours.";
       }
     }
   }
@@ -798,35 +1328,79 @@
     const sysTabs = document.querySelectorAll(".system-tab-btn");
     sysTabs.forEach(btn => {
       btn.addEventListener("click", () => {
-        sysTabs.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
         const sys = btn.getAttribute("data-system");
-        const data = SYMPTOM_DATABASE[sys] || SYMPTOM_DATABASE["brakes"];
-
-        document.getElementById("diag-headline").textContent = data.headline;
-        document.getElementById("diag-explanation").textContent = data.explanation;
-        document.getElementById("diag-service-name").textContent = data.title;
-        document.getElementById("diag-parts").textContent = data.parts;
-        document.getElementById("diag-labor").textContent = data.labor;
-        document.getElementById("diag-total").textContent = data.total;
+        renderDiagnostics(sys);
       });
     });
+
+    // OBD-II Code Lookup & Quick Selection Chips
+    function lookupObdCode(rawCode) {
+      const code = (rawCode || "").trim().toUpperCase();
+      if (!code) {
+        showToast("Please enter an OBD-II code (e.g., P0420, P0300)", "warning");
+        return;
+      }
+      const obdInput = document.getElementById("obd-input");
+      if (obdInput) obdInput.value = code;
+
+      const found = OBD_CODES_DATABASE[code];
+      const headline = document.getElementById("diag-headline");
+      const explanation = document.getElementById("diag-explanation");
+      const serviceName = document.getElementById("diag-service-name");
+      const parts = document.getElementById("diag-parts");
+      const labor = document.getElementById("diag-labor");
+      const total = document.getElementById("diag-total");
+
+      if (found) {
+        showToast(`Diagnosing code ${code}: ${found.title.split("(")[0]}`, "info");
+        if (headline) headline.textContent = `OBD-II Code ${code} Diagnostic`;
+        if (explanation) explanation.textContent = found.explanation;
+        if (serviceName) serviceName.textContent = found.service;
+        if (parts) parts.textContent = found.parts;
+        if (labor) labor.textContent = found.labor;
+        if (total) total.textContent = found.total;
+      } else {
+        showToast(`Code ${code} logged. Live scan recommended.`, "info");
+        if (headline) headline.textContent = `OBD-II Code ${code} Diagnostic Scan`;
+        if (explanation) explanation.textContent = `Trouble code ${code} logged in vehicle ECU. Sensor data live graph and freeze-frame analysis required to isolate fault. If you do not have an OBD-II scanner, Habesha Auto provides complimentary live OBD-II diagnostic scans at Bay 1.`;
+        if (serviceName) serviceName.textContent = "Live Stream Scanner Diagnostic & ECU Read";
+        if (parts) parts.textContent = "$0.00 – $45.00";
+        if (labor) labor.textContent = "$95.00 – $120.00";
+        if (total) total.textContent = "$95.00 – $165.00";
+      }
+    }
 
     const obdBtn = document.getElementById("obd-lookup-btn");
     if (obdBtn) {
       obdBtn.addEventListener("click", () => {
-        const code = document.getElementById("obd-input").value.trim().toUpperCase();
-        if (!code) {
-          showToast("Please enter an OBD-II code (e.g. P0420)", "warning");
-          return;
+        const code = document.getElementById("obd-input").value;
+        lookupObdCode(code);
+      });
+    }
+
+    const obdInput = document.getElementById("obd-input");
+    if (obdInput) {
+      obdInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          lookupObdCode(obdInput.value);
         }
-        showToast(`Diagnosing code ${code}: Catalytic System Efficiency Fault`, "info");
-        document.getElementById("diag-headline").textContent = `OBD-II Code ${code} Diagnostic`;
-        document.getElementById("diag-explanation").textContent = `Code ${code} indicates bank 1 sensor correlation drift or catalytic converter threshold loss. Live sensor graph & vacuum leak test recommended.`;
-        document.getElementById("diag-service-name").textContent = "OBD-II Code Live Stream Diagnostic";
-        document.getElementById("diag-parts").textContent = "$0.00 – $45.00";
-        document.getElementById("diag-labor").textContent = "$95.00 – $120.00";
-        document.getElementById("diag-total").textContent = "$95.00 – $165.00";
+      });
+    }
+
+    // Quick OBD Code Chips
+    document.querySelectorAll(".obd-quick-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const code = chip.getAttribute("data-code");
+        lookupObdCode(code);
+      });
+    });
+
+    // Switch vehicle button from Diagnostics
+    const diagSwitchVehBtn = document.getElementById("diag-switch-veh-btn");
+    if (diagSwitchVehBtn) {
+      diagSwitchVehBtn.addEventListener("click", () => {
+        openGarage();
       });
     }
 
@@ -952,8 +1526,9 @@
     const simFindingBtn = document.getElementById("sim-trigger-finding-btn");
     if (simFindingBtn) {
       simFindingBtn.addEventListener("click", () => {
-        navigateTo("estimate");
-        showToast("New inspection issue flagged by technician!", "warning");
+        state.progress.findingApproved = null;
+        renderProgress();
+        showToast("⚠️ Technician flagged finding (Brake Pad 2mm). Review Required!", "warning");
       });
     }
 
@@ -963,6 +1538,7 @@
       approveBtn.addEventListener("click", () => {
         state.progress.findingApproved = true;
         renderEstimate();
+        renderProgress();
         showToast("Finding approved! $96.00 added to authorization.", "success");
       });
     }
@@ -972,6 +1548,7 @@
       declineBtn.addEventListener("click", () => {
         state.progress.findingApproved = false;
         renderEstimate();
+        renderProgress();
         showToast("Finding declined. Work deferred to your next visit.", "info");
       });
     }
@@ -1061,25 +1638,106 @@
       });
     });
 
+    // ==========================================
+    // DYNAMIC MODAL PORTAL & CONDITIONAL MOUNTING
+    // ==========================================
+    const modalPortal = document.getElementById("modal-portal");
+
+    function mountTemplate(templateId) {
+      if (!modalPortal) return null;
+      modalPortal.innerHTML = "";
+      const tmpl = document.getElementById(templateId);
+      if (!tmpl) return null;
+      const clone = tmpl.content.cloneNode(true);
+      modalPortal.appendChild(clone);
+      return modalPortal.firstElementChild;
+    }
+
+    function unmountModals() {
+      if (modalPortal) modalPortal.innerHTML = "";
+      document.body.classList.remove("modal-open");
+    }
+
+    // Universal Modal Handlers: Esc Key Dismissal
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        unmountModals();
+      }
+    });
+
+    // ------------------------------------------
     // Garage Modal Handling
-    const garageModal = document.getElementById("garage-modal");
+    // ------------------------------------------
     const openGarageBtn = document.getElementById("open-garage-modal-btn");
     const navVehSelector = document.getElementById("nav-veh-selector");
     const bookChangeVehBtn = document.getElementById("book-change-veh-btn");
-    const closeGarageBtn = document.getElementById("close-garage-modal-btn");
 
     function openGarage() {
+      const garageModal = mountTemplate("garage-modal-template");
+      if (!garageModal) return;
+
+      garageModal.style.display = "flex";
+      garageModal.removeAttribute("inert");
+      garageModal.setAttribute("aria-hidden", "false");
+      garageModal.classList.add("active");
+      document.body.classList.add("modal-open");
+
+      const closeGarageBtn = document.getElementById("close-garage-modal-btn");
+      if (closeGarageBtn) closeGarageBtn.addEventListener("click", closeGarage);
+
+      garageModal.addEventListener("click", (e) => {
+        if (e.target === garageModal) closeGarage();
+      });
+
+      const addVehForm = document.getElementById("add-vehicle-form");
+      if (addVehForm) {
+        addVehForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const model = document.getElementById("new-veh-model").value.trim();
+          const plate = document.getElementById("new-veh-vin").value.trim() || "NEW-VEH";
+          const miles = document.getElementById("new-veh-miles").value.trim() || "12,000";
+
+          if (!model) {
+            showToast("Please enter vehicle model", "warning");
+            return;
+          }
+
+          const newVeh = {
+            id: "veh-" + (state.vehicles.length + 1),
+            title: model,
+            vin: plate.length === 17 ? plate : ("1" + Math.random().toString(36).substring(2, 10).toUpperCase()),
+            plate: plate,
+            miles: miles,
+            health: "Certified Good",
+            oilLife: 95,
+            brakesMm: "8.0mm (80%)"
+          };
+
+          state.vehicles.push(newVeh);
+          state.activeVehicleIndex = state.vehicles.length - 1;
+          try {
+            localStorage.setItem("habesha_custom_vehicles", JSON.stringify(state.vehicles));
+          } catch (e) {}
+
+          closeGarage();
+          renderHome();
+          renderBooking();
+          showToast(`${model} added and selected as active vehicle!`, "success");
+        });
+      }
+
       renderGarageModal();
-      if (garageModal) garageModal.classList.add("active");
+      const firstInput = garageModal.querySelector("input, button");
+      if (firstInput) setTimeout(() => firstInput.focus(), 50);
     }
+
     function closeGarage() {
-      if (garageModal) garageModal.classList.remove("active");
+      unmountModals();
     }
 
     if (openGarageBtn) openGarageBtn.addEventListener("click", openGarage);
     if (navVehSelector) navVehSelector.addEventListener("click", openGarage);
     if (bookChangeVehBtn) bookChangeVehBtn.addEventListener("click", openGarage);
-    if (closeGarageBtn) closeGarageBtn.addEventListener("click", closeGarage);
 
     function renderGarageModal() {
       const container = document.getElementById("modal-garage-vehicles");
@@ -1087,8 +1745,19 @@
 
       if (!state.vehicles.length) {
         container.innerHTML = `
-          <div style="padding:16px; text-align:center; background:var(--bg-input); border-radius:8px; color:var(--text-secondary); font-size:13px; line-height:1.6;">
-            🚗 No vehicles in your garage yet.<br>Add your vehicle using the quick form below, or <button class="btn-link" style="color:var(--accent); text-decoration:underline; background:none; border:none; cursor:pointer; font-weight:600;" id="modal-signin-link">Sign In</button> to load your saved garage.
+          <div style="margin-bottom:12px; padding:12px 14px; background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.25); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:13.5px; color:#fff; display:flex; align-items:center; gap:8px;">
+                2025 Honda CR-V Hybrid <span class="pill pill-demo" style="font-size:10px; padding:2px 6px;">Demo Vehicle</span>
+              </div>
+              <div style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono); margin-top:2px;">
+                Plate: EOGA45 &bull; 55,000 miles (Interactive Telemetry)
+              </div>
+            </div>
+            <span class="pill pill-subtle" style="font-size:11px;">Guest Preview</span>
+          </div>
+          <div style="padding:14px; text-align:center; background:var(--bg-input); border-radius:8px; color:var(--text-secondary); font-size:13px; line-height:1.6; border:1px dashed var(--border-medium);">
+            🚗 <strong>Own a different vehicle?</strong> Add it below to track real service, or <button class="btn-link" style="color:var(--accent); text-decoration:underline; background:none; border:none; cursor:pointer; font-weight:600; padding:0;" id="modal-signin-link">Sign In</button> to load your saved garage.
           </div>
         `;
         const link = document.getElementById("modal-signin-link");
@@ -1107,7 +1776,7 @@
             <div style="font-weight:700; font-size:14.5px; color:#fff;">${v.title}</div>
             <div style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">Plate: ${v.plate || 'N/A'} &bull; ${v.miles || 0} miles</div>
           </div>
-          ${idx === state.activeVehicleIndex ? '<span class="pill pill-accent">Active</span>' : '<button class="btn btn-outline btn-sm">Select</button>'}
+          ${idx === state.activeVehicleIndex ? '<span class="pill pill-subtle"><span class="status-dot green"></span>Active</span>' : '<button class="btn btn-outline btn-sm">Select</button>'}
         </div>
       `).join("");
 
@@ -1122,90 +1791,353 @@
       });
     }
 
-    const addVehForm = document.getElementById("add-vehicle-form");
-    if (addVehForm) {
-      addVehForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const model = document.getElementById("new-veh-model").value.trim();
-        const plate = document.getElementById("new-veh-vin").value.trim() || "NEW-VEH";
-        const miles = document.getElementById("new-veh-miles").value.trim() || "12,000";
-
-        if (!model) {
-          showToast("Please enter vehicle model", "warning");
-          return;
-        }
-
-        const newVeh = {
-          id: "veh-" + (state.vehicles.length + 1),
-          title: model,
-          vin: plate.length === 17 ? plate : ("1" + Math.random().toString(36).substring(2, 10).toUpperCase()),
-          plate: plate,
-          miles: miles,
-          health: "Certified Good",
-          oilLife: 95,
-          brakesMm: "8.0mm (80%)"
-        };
-
-        state.vehicles.push(newVeh);
-        state.activeVehicleIndex = state.vehicles.length - 1;
-        try {
-          localStorage.setItem("habesha_custom_vehicles", JSON.stringify(state.vehicles));
-        } catch (e) {}
-
-        closeGarage();
-        renderHome();
-        renderBooking();
-        showToast(`${model} added and selected as active vehicle!`, "success");
-        addVehForm.reset();
-      });
-    }
-
-    // ==========================================
+    // ------------------------------------------
     // AUTHENTICATION & SESSION CONTROLLER
-    // ==========================================
-    const authModal = document.getElementById("auth-modal");
-    const signinForm = document.getElementById("signin-form");
-    const signupForm = document.getElementById("signup-form");
-    const tabSigninBtn = document.getElementById("tab-signin-btn");
-    const tabSignupBtn = document.getElementById("tab-signup-btn");
-    const authTitle = document.getElementById("auth-modal-title");
-    const authErrorBanner = document.getElementById("auth-error-banner");
-    const authErrorText = document.getElementById("auth-error-text");
-    const closeAuthModalBtn = document.getElementById("close-auth-modal-btn");
+    // ------------------------------------------
     const navAuthBtn = document.getElementById("nav-auth-btn");
     const signinAccountBtn = document.getElementById("signin-account-btn");
     const signoutBtn = document.getElementById("signout-btn");
-    const forgotContainer = document.getElementById("forgot-password-container");
-    const forgotStep1 = document.getElementById("forgot-step1-form");
-    const forgotStep2 = document.getElementById("forgot-step2-form");
-    const authTabsContainer = document.getElementById("auth-tabs-container");
-    const authSuccessBanner = document.getElementById("auth-success-banner");
-    const authSuccessText = document.getElementById("auth-success-text");
-    const linkForgotPassword = document.getElementById("link-forgot-password");
-    const btnBackToSignin1 = document.getElementById("btn-back-to-signin-1");
-    const btnBackToSignin2 = document.getElementById("btn-back-to-signin-2");
-    const btnResendOtp = document.getElementById("btn-resend-otp");
-
     let currentForgotEmail = "";
 
     function openAuthModal(mode = "signin") {
+      const authModal = mountTemplate("auth-modal-template");
       if (!authModal) return;
-      hideAuthError();
-      hideAuthSuccess();
-      switchAuthTab(mode);
+
+      authModal.style.display = "flex";
+      authModal.removeAttribute("inert");
+      authModal.setAttribute("aria-hidden", "false");
       authModal.classList.add("active");
+      document.body.classList.add("modal-open");
+
+      // Bind close button
+      const closeAuthModalBtn = document.getElementById("close-auth-modal-btn");
+      if (closeAuthModalBtn) closeAuthModalBtn.addEventListener("click", closeAuthModal);
+
+      // Bind backdrop click
+      authModal.addEventListener("click", (e) => {
+        if (e.target === authModal) closeAuthModal();
+      });
+
+      // Bind tabs
+      const tabSigninBtn = document.getElementById("tab-signin-btn");
+      const tabSignupBtn = document.getElementById("tab-signup-btn");
+      if (tabSigninBtn) tabSigninBtn.addEventListener("click", () => switchAuthTab("signin"));
+      if (tabSignupBtn) tabSignupBtn.addEventListener("click", () => switchAuthTab("signup"));
+
+      // Password toggles
+      setupPassToggle("toggle-signin-pass", "signin-password");
+      setupPassToggle("toggle-signup-pass", "signup-password");
+      setupPassToggle("toggle-reset-pass", "reset-new-password");
+
+      // Forgot password link & back buttons
+      const linkForgotPassword = document.getElementById("link-forgot-password");
+      const btnBackToSignin1 = document.getElementById("btn-back-to-signin-1");
+      const btnBackToSignin2 = document.getElementById("btn-back-to-signin-2");
+      const btnResendOtp = document.getElementById("btn-resend-otp");
+      const demoFillBtn = document.getElementById("auth-fill-demo-btn");
+
+      if (linkForgotPassword) linkForgotPassword.addEventListener("click", () => switchAuthTab("forgot"));
+      if (btnBackToSignin1) btnBackToSignin1.addEventListener("click", () => switchAuthTab("signin"));
+      if (btnBackToSignin2) btnBackToSignin2.addEventListener("click", () => switchAuthTab("signin"));
+
+      if (demoFillBtn) {
+        demoFillBtn.addEventListener("click", () => {
+          const emailInput = document.getElementById("signin-email");
+          const passInput = document.getElementById("signin-password");
+          if (emailInput && passInput) {
+            emailInput.value = "ayagirma@gmail.com";
+            passInput.value = "";
+            passInput.focus();
+            showToast("Filled registered account (ayagirma@gmail.com)", "info");
+          }
+        });
+      }
+
+      // Step 1: Send OTP for password reset
+      const forgotStep1 = document.getElementById("forgot-step1-form");
+      if (forgotStep1) {
+        forgotStep1.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("forgot-email").value.trim().toLowerCase();
+          const sendBtn = document.getElementById("forgot-send-otp-btn");
+
+          if (!email) {
+            showAuthError("Please enter your account email address.");
+            return;
+          }
+
+          const prevText = sendBtn.textContent;
+          sendBtn.disabled = true;
+          sendBtn.textContent = "Sending Verification Code...";
+          hideAuthError();
+
+          const res = await api.post("/auth/forgot-password", { email });
+          sendBtn.disabled = false;
+          sendBtn.textContent = prevText;
+
+          if (!res.ok) {
+            showAuthError(res.data?.error || "Unable to send verification code. Please try again.");
+            return;
+          }
+
+          currentForgotEmail = email;
+          const displayEl = document.getElementById("forgot-target-email-display");
+          if (displayEl) displayEl.textContent = email;
+
+          forgotStep1.style.display = "none";
+          const forgotStep2 = document.getElementById("forgot-step2-form");
+          if (forgotStep2) forgotStep2.style.display = "flex";
+          showToast(`Verification code sent to ${email}`, "success");
+          const otpInput = document.getElementById("reset-otp-code");
+          if (otpInput) {
+            otpInput.value = "";
+            otpInput.focus();
+          }
+        });
+      }
+
+      // Step 2: Verify OTP & Reset Password
+      const forgotStep2 = document.getElementById("forgot-step2-form");
+      if (forgotStep2) {
+        forgotStep2.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const otp = document.getElementById("reset-otp-code").value.trim();
+          const newPassword = document.getElementById("reset-new-password").value;
+          const confirmPassword = document.getElementById("reset-confirm-password").value;
+          const submitBtn = document.getElementById("reset-password-submit-btn");
+
+          if (!otp || otp.length !== 6) {
+            showAuthError("Please enter the complete 6-digit code received in your email.");
+            return;
+          }
+
+          if (!newPassword || newPassword.length < 8) {
+            showAuthError("Password must be at least 8 characters long.");
+            return;
+          }
+
+          if (newPassword !== confirmPassword) {
+            showAuthError("Passwords do not match. Please verify both fields.");
+            return;
+          }
+
+          const prevText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Updating Password...";
+          hideAuthError();
+
+          const res = await api.post("/auth/reset-password", {
+            email: currentForgotEmail,
+            otp,
+            newPassword
+          });
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = prevText;
+
+          if (!res.ok) {
+            showAuthError(res.data?.error || "Password reset failed. Check the verification code.");
+            return;
+          }
+
+          showToast("Password updated successfully! Signing you in...", "success");
+          switchAuthTab("signin");
+          showAuthSuccess("Your password was successfully reset. You can now sign in.");
+
+          const signinEmail = document.getElementById("signin-email");
+          const signinPass = document.getElementById("signin-password");
+          if (signinEmail) signinEmail.value = currentForgotEmail;
+          if (signinPass) signinPass.value = newPassword;
+        });
+      }
+
+      if (btnResendOtp) {
+        btnResendOtp.addEventListener("click", async () => {
+          if (!currentForgotEmail) return;
+          btnResendOtp.disabled = true;
+          btnResendOtp.textContent = "Sending...";
+          const res = await api.post("/auth/forgot-password", { email: currentForgotEmail });
+          btnResendOtp.disabled = false;
+          btnResendOtp.textContent = "Resend Code";
+          if (res.ok) {
+            showToast(`New 6-digit code sent to ${currentForgotEmail}`, "info");
+          } else {
+            showAuthError(res.data?.error || "Failed to resend code.");
+          }
+        });
+      }
+
+      // Sign In Submission
+      const signinForm = document.getElementById("signin-form");
+      if (signinForm) {
+        signinForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("signin-email").value.trim();
+          const password = document.getElementById("signin-password").value;
+          const submitBtn = document.getElementById("signin-submit-btn");
+
+          if (!email || !password) {
+            showAuthError("Please provide both email and password.");
+            return;
+          }
+
+          const prevText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Signing In...";
+          hideAuthError();
+
+          const res = await api.post("/auth/signin", { email, password });
+          submitBtn.disabled = false;
+          submitBtn.textContent = prevText;
+
+          if (!res.ok) {
+            showAuthError(res.data?.error || "Authentication failed. Check your email & password.");
+            return;
+          }
+
+          state.isAuthenticated = true;
+          if (res.data && res.data.user) {
+            state.user = {
+              name: res.data.user.name,
+              email: res.data.user.email,
+              phone: res.data.user.phone
+            };
+          }
+          if (res.data && res.data.vehicle) {
+            const vehTitle = `${res.data.vehicle.year || ''} ${res.data.vehicle.model || ''}`.trim() || "My Vehicle";
+            const rawVin = res.data.vehicle.vin || "";
+            const plateStr = rawVin.startsWith("PLATE:") ? rawVin.replace("PLATE:", "") : (res.data.vehicle.plate || "SAVED");
+            const displayVin = rawVin || (plateStr ? `Plate: ${plateStr}` : "Pending Bay Scan");
+
+            state.vehicles = [
+              {
+                id: "veh-main",
+                title: vehTitle,
+                vin: displayVin,
+                plate: plateStr,
+                miles: String(res.data.vehicle.miles || "0"),
+                health: "Certified Good",
+                oilLife: 85,
+                brakesMm: "6.0mm"
+              }
+            ];
+            state.activeVehicleIndex = 0;
+          }
+
+          closeAuthModal();
+          showToast(`Welcome back, ${state.user.name}!`, "success");
+          await syncBackendData();
+          updateAuthUI();
+          renderHome();
+          renderAccount();
+        });
+      }
+
+      // Sign Up Submission
+      const signupForm = document.getElementById("signup-form");
+      if (signupForm) {
+        signupForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("signup-name").value.trim();
+          const phone = document.getElementById("signup-phone").value.trim();
+          const email = document.getElementById("signup-email").value.trim();
+          const password = document.getElementById("signup-password").value;
+          const plate = (document.getElementById("signup-plate")?.value || "").trim().toUpperCase();
+          const vin = (document.getElementById("signup-vin")?.value || "").trim().toUpperCase();
+          const model = document.getElementById("signup-model").value.trim();
+          const miles = parseInt(document.getElementById("signup-miles").value, 10) || 0;
+          const submitBtn = document.getElementById("signup-submit-btn");
+
+          if (password.length < 8) {
+            showAuthError("Password must be at least 8 characters long.");
+            return;
+          }
+
+          const prevText = submitBtn.textContent;
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Creating Account...";
+          hideAuthError();
+
+          const res = await api.post("/auth/signup", {
+            name,
+            email,
+            phone,
+            password,
+            plate,
+            vin,
+            year: model.split(" ")[0] || "2022",
+            model,
+            miles
+          });
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = prevText;
+
+          if (!res.ok) {
+            showAuthError(res.data?.error || "Registration failed. Please check your inputs.");
+            return;
+          }
+
+          state.isAuthenticated = true;
+          if (res.data && res.data.user) {
+            state.user = {
+              name: res.data.user.name,
+              email: res.data.user.email,
+              phone: res.data.user.phone
+            };
+          }
+          if (res.data && res.data.vehicle) {
+            const vehVin = res.data.vehicle.vin || (plate ? `Plate: ${plate}` : "Pending Bay Scan");
+            state.vehicles = [
+              {
+                id: "veh-main",
+                title: `${res.data.vehicle.year || ''} ${res.data.vehicle.model || ''}`.trim() || model,
+                vin: vehVin,
+                plate: plate || "SAVED",
+                miles: String(res.data.vehicle.miles || miles),
+                health: "Certified Good",
+                oilLife: 95,
+                brakesMm: "8.0mm"
+              }
+            ];
+            state.activeVehicleIndex = 0;
+          }
+
+          closeAuthModal();
+          showToast(`Welcome to Habesha Auto, ${state.user.name}!`, "success");
+          await syncBackendData();
+          updateAuthUI();
+          renderHome();
+          renderAccount();
+        });
+      }
+
+      switchAuthTab(mode);
+      const firstInput = authModal.querySelector("input:not([type=hidden]), button.auth-tab-btn");
+      if (firstInput) setTimeout(() => firstInput.focus(), 50);
     }
 
     function closeAuthModal() {
-      if (!authModal) return;
-      authModal.classList.remove("active");
-      hideAuthError();
-      hideAuthSuccess();
+      unmountModals();
     }
+
+    // Modal Event Triggers
+    if (navAuthBtn) navAuthBtn.addEventListener("click", () => openAuthModal("signin"));
+    if (signinAccountBtn) signinAccountBtn.addEventListener("click", () => openAuthModal("signin"));
 
     function switchAuthTab(mode) {
       hideAuthError();
       hideAuthSuccess();
+      const authTabsContainer = document.getElementById("auth-tabs-container");
+      const tabSigninBtn = document.getElementById("tab-signin-btn");
+      const tabSignupBtn = document.getElementById("tab-signup-btn");
+      const signinForm = document.getElementById("signin-form");
+      const signupForm = document.getElementById("signup-form");
+      const forgotContainer = document.getElementById("forgot-password-container");
+      const forgotStep1 = document.getElementById("forgot-step1-form");
+      const forgotStep2 = document.getElementById("forgot-step2-form");
+      const authTitle = document.getElementById("auth-modal-title");
+
       if (mode === "signup") {
         if (authTabsContainer) authTabsContainer.style.display = "flex";
         if (tabSigninBtn) tabSigninBtn.classList.remove("active");
@@ -1239,6 +2171,8 @@
     }
 
     function showAuthError(msg) {
+      const authErrorBanner = document.getElementById("auth-error-banner");
+      const authErrorText = document.getElementById("auth-error-text");
       if (!authErrorBanner || !authErrorText) return;
       authErrorText.textContent = msg || "An error occurred";
       authErrorBanner.classList.add("visible");
@@ -1246,11 +2180,14 @@
     }
 
     function hideAuthError() {
+      const authErrorBanner = document.getElementById("auth-error-banner");
       if (!authErrorBanner) return;
       authErrorBanner.classList.remove("visible");
     }
 
     function showAuthSuccess(msg) {
+      const authSuccessBanner = document.getElementById("auth-success-banner");
+      const authSuccessText = document.getElementById("auth-success-text");
       if (!authSuccessBanner || !authSuccessText) return;
       authSuccessText.textContent = msg || "Success!";
       authSuccessBanner.style.display = "flex";
@@ -1258,6 +2195,7 @@
     }
 
     function hideAuthSuccess() {
+      const authSuccessBanner = document.getElementById("auth-success-banner");
       if (!authSuccessBanner) return;
       authSuccessBanner.style.display = "none";
     }
@@ -1273,132 +2211,6 @@
         } else {
           input.type = "password";
           btn.textContent = "👁️";
-        }
-      });
-    }
-
-    setupPassToggle("toggle-signin-pass", "signin-password");
-    setupPassToggle("toggle-signup-pass", "signup-password");
-    setupPassToggle("toggle-reset-pass", "reset-new-password");
-
-    if (linkForgotPassword) {
-      linkForgotPassword.addEventListener("click", () => switchAuthTab("forgot"));
-    }
-    if (btnBackToSignin1) {
-      btnBackToSignin1.addEventListener("click", () => switchAuthTab("signin"));
-    }
-    if (btnBackToSignin2) {
-      btnBackToSignin2.addEventListener("click", () => switchAuthTab("signin"));
-    }
-
-    // Step 1: Send OTP for password reset
-    if (forgotStep1) {
-      forgotStep1.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.getElementById("forgot-email").value.trim().toLowerCase();
-        const sendBtn = document.getElementById("forgot-send-otp-btn");
-
-        if (!email) {
-          showAuthError("Please enter your account email address.");
-          return;
-        }
-
-        const prevText = sendBtn.textContent;
-        sendBtn.disabled = true;
-        sendBtn.textContent = "Sending Verification Code...";
-        hideAuthError();
-
-        const res = await api.post("/auth/forgot-password", { email });
-        sendBtn.disabled = false;
-        sendBtn.textContent = prevText;
-
-        if (!res.ok) {
-          showAuthError(res.data?.error || "Unable to send verification code. Please try again.");
-          return;
-        }
-
-        currentForgotEmail = email;
-        const displayEl = document.getElementById("forgot-target-email-display");
-        if (displayEl) displayEl.textContent = email;
-
-        forgotStep1.style.display = "none";
-        forgotStep2.style.display = "flex";
-        showToast(`Verification code sent to ${email}`, "success");
-        const otpInput = document.getElementById("reset-otp-code");
-        if (otpInput) {
-          otpInput.value = "";
-          otpInput.focus();
-        }
-      });
-    }
-
-    // Step 2: Verify OTP & Reset Password
-    if (forgotStep2) {
-      forgotStep2.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const otp = document.getElementById("reset-otp-code").value.trim();
-        const newPassword = document.getElementById("reset-new-password").value;
-        const confirmPassword = document.getElementById("reset-confirm-password").value;
-        const submitBtn = document.getElementById("reset-password-submit-btn");
-
-        if (!otp || otp.length !== 6) {
-          showAuthError("Please enter the complete 6-digit code received in your email.");
-          return;
-        }
-
-        if (!newPassword || newPassword.length < 8) {
-          showAuthError("Password must be at least 8 characters long.");
-          return;
-        }
-
-        if (newPassword !== confirmPassword) {
-          showAuthError("Passwords do not match. Please verify both fields.");
-          return;
-        }
-
-        const prevText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Updating Password...";
-        hideAuthError();
-
-        const res = await api.post("/auth/reset-password", {
-          email: currentForgotEmail,
-          otp,
-          newPassword
-        });
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = prevText;
-
-        if (!res.ok) {
-          showAuthError(res.data?.error || "Password reset failed. Check the verification code.");
-          return;
-        }
-
-        showToast("Password updated successfully! Signing you in...", "success");
-        switchAuthTab("signin");
-        showAuthSuccess("Your password was successfully reset. You can now sign in.");
-
-        const signinEmail = document.getElementById("signin-email");
-        const signinPass = document.getElementById("signin-password");
-        if (signinEmail) signinEmail.value = currentForgotEmail;
-        if (signinPass) signinPass.value = newPassword;
-      });
-    }
-
-    // Resend OTP
-    if (btnResendOtp) {
-      btnResendOtp.addEventListener("click", async () => {
-        if (!currentForgotEmail) return;
-        btnResendOtp.disabled = true;
-        btnResendOtp.textContent = "Sending...";
-        const res = await api.post("/auth/forgot-password", { email: currentForgotEmail });
-        btnResendOtp.disabled = false;
-        btnResendOtp.textContent = "Resend Code";
-        if (res.ok) {
-          showToast(`New 6-digit code sent to ${currentForgotEmail}`, "info");
-        } else {
-          showAuthError(res.data?.error || "Failed to resend code.");
         }
       });
     }

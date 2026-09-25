@@ -503,6 +503,29 @@ input, select, textarea {
   box-shadow: none;
 }
 
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-warning-subtle {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.btn-warning-subtle:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.5);
+  color: #fde68a;
+}
+
 .btn-dark {
   background: var(--bg-card);
   color: var(--text-primary);
@@ -640,10 +663,70 @@ input, select, textarea {
   color: var(--accent);
   border: 1px solid rgba(255, 90, 31, 0.3);
 }
+.pill-subtle {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 500;
+}
+.pill-demo {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 .pill-dark {
+
+@keyframes pulse-amber-alert {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    border-color: #f59e0b;
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+    border-color: #fbbf24;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    border-color: #f59e0b;
+  }
+}
+
+.btn-pulse-alert {
+  animation: pulse-amber-alert 1.8s infinite !important;
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #fde68a !important;
+  border: 1.5px solid #f59e0b !important;
+  font-weight: 700 !important;
+}
   background: var(--bg-core);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.status-dot.green {
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+}
+.status-dot.orange, .status-dot.amber {
+  background: var(--warning);
+  box-shadow: 0 0 6px var(--warning);
+}
+.status-dot.blue {
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+.status-dot.accent {
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }
 
 /* ==========================================================================
@@ -782,6 +865,75 @@ input, select, textarea {
   border-color: var(--accent);
   color: #FFFFFF;
   box-shadow: 0 0 16px var(--accent-glow);
+}
+
+/* Sub-Symptom Granularity Selector */
+.sub-symptoms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 20px;
+}
+
+.sub-symptom-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sub-symptom-chip:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-medium);
+  color: #FFFFFF;
+}
+.sub-symptom-chip.active {
+  background: rgba(255, 90, 31, 0.12);
+  border-color: var(--accent);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* OBD-II Quick Search Chips */
+.obd-quick-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.obd-quick-chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.obd-quick-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.veh-context-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  margin-bottom: 14px;
 }
 
 .symptom-result-card {
@@ -1103,8 +1255,13 @@ input, select, textarea {
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
 }
-.time-slot-btn:hover {
+.time-slot-btn:hover:not(.disabled) {
   border-color: var(--border-medium);
 }
 .time-slot-btn.selected {
@@ -1112,6 +1269,60 @@ input, select, textarea {
   border-color: var(--accent);
   color: #fff;
 }
+.time-slot-btn.disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+.time-slot-btn.disabled .slot-time-text {
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+.time-slot-btn .slot-cutoff-hint {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #f87171;
+  margin-top: 3px;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  line-height: 1.2;
+}
+
+/* Pricing Nuance Note & Policy Accordion */
+.pricing-disclaimer-note {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  border: 1px dashed var(--border-subtle);
+  line-height: 1.45;
+}
+
+.policy-accordion-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: border-color 0.2s ease;
+}
+.policy-accordion-box[open] {
+  border-color: var(--border-medium);
+}
+.policy-accordion-box summary {
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+.policy-accordion-box summary::-webkit-details-marker {
+  display: none;
+}
+
 
 /* ==========================================================================
    24/7 KEY LOCKER & CONTACTLESS TOOL
@@ -1416,10 +1627,10 @@ input, select, textarea {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.82);
   backdrop-filter: blur(8px);
   z-index: 200;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -1428,6 +1639,7 @@ input, select, textarea {
   transition: opacity 0.25s ease;
 }
 .modal-overlay.active {
+  display: flex !important;
   opacity: 1;
   pointer-events: auto;
 }

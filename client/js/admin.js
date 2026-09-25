@@ -101,7 +101,7 @@
         adminRoleBadge.textContent = "Shop Manager / Foreman";
       }
       if (adminLogoBadge) adminLogoBadge.style.background = "linear-gradient(135deg,#3B82F6,#1D4ED8)";
-      if (adminSubTitle) adminSubTitle.textContent = "OPERATIONS &bull; MANAGERIAL COCKPIT";
+      if (adminSubTitle) adminSubTitle.textContent = "OPERATIONS • MANAGERIAL COCKPIT";
       if (adminUserName) adminUserName.textContent = staffUser ? staffUser.name : "Girma Ayele";
       fetchManagerData();
       return;
@@ -115,7 +115,7 @@
         adminRoleBadge.textContent = "Lead Bay Technician";
       }
       if (adminLogoBadge) adminLogoBadge.style.background = "linear-gradient(135deg,#FF5A1F,#C83800)";
-      if (adminSubTitle) adminSubTitle.textContent = "BAY TERMINAL &bull; STAFF CONSOLE";
+      if (adminSubTitle) adminSubTitle.textContent = "BAY TERMINAL • STAFF CONSOLE";
       if (adminUserName) adminUserName.textContent = staffUser ? staffUser.name : "Marcus Vance";
       fetchTechData();
       return;
@@ -196,10 +196,31 @@
     container.innerHTML = bays.map(bay => {
       const isVacant = bay.status === "available";
       const hasFinding = bay.finding && bay.finding.customerStatus === "pending";
+      const isRoadTest = !isVacant && bay.currentStep >= 4;
       const pct = isVacant ? 0 : Math.round(((bay.currentStep + 1) / 5) * 100);
 
+      let cardBorderColor = "var(--border-subtle)";
+      let cardBg = "var(--bg-card)";
+      let statusBadge = "";
+
+      if (isVacant) {
+        cardBorderColor = "#22c55e";
+        statusBadge = `<span class="pill pill-good" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.35); font-weight:700;"><span class="status-dot green"></span>Bay Open</span>`;
+      } else if (hasFinding) {
+        cardBorderColor = "#f59e0b";
+        cardBg = "linear-gradient(145deg, rgba(245,158,11,0.06), var(--bg-card))";
+        statusBadge = `<span class="pill pill-warning" style="background:rgba(245,158,11,0.18); color:#fde047; border:1px solid rgba(245,158,11,0.45); font-weight:700;"><span class="status-dot amber"></span>Awaiting Approval</span>`;
+      } else if (isRoadTest) {
+        cardBorderColor = "#38bdf8";
+        cardBg = "linear-gradient(145deg, rgba(56,189,248,0.06), var(--bg-card))";
+        statusBadge = `<span class="pill pill-cyan" style="background:rgba(56,189,248,0.18); color:#38bdf8; border:1px solid rgba(56,189,248,0.45); font-weight:700;"><span class="status-dot cyan" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span>Road Test / QC</span>`;
+      } else {
+        cardBorderColor = "#22c55e";
+        statusBadge = `<span class="pill pill-good" style="background:rgba(34,197,94,0.15); color:#86efac; border:1px solid rgba(34,197,94,0.35); font-weight:700;"><span class="status-dot green"></span>On Schedule &bull; Step ${bay.currentStep + 1}/5</span>`;
+      }
+
       return `
-        <div class="manager-bay-card ${hasFinding ? 'has-alert' : ''}">
+        <div class="manager-bay-card ${hasFinding ? 'has-alert' : ''}" style="border-left: 4px solid ${cardBorderColor}; background: ${cardBg};">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <span class="eyebrow" style="margin-bottom:0;">${bay.bayName.split('(')[0]}</span>
@@ -207,7 +228,7 @@
                 ${bay.vehicle ? bay.vehicle.title : 'Bay Available'}
               </h3>
             </div>
-            ${isVacant ? `<span class="pill pill-good">Open</span>` : `<span class="pill pill-accent">Step ${bay.currentStep + 1}/5</span>`}
+            ${statusBadge}
           </div>
 
           <div style="margin:4px 0;">
@@ -216,7 +237,7 @@
               <span class="font-mono">${pct}%</span>
             </div>
             <div class="gauge-bar-track">
-              <div class="gauge-bar-fill good" style="width:${pct}%"></div>
+              <div class="gauge-bar-fill ${hasFinding ? 'warning' : (isRoadTest ? 'cyan' : 'good')}" style="width:${pct}%; ${isRoadTest ? 'background:#38bdf8;' : ''}"></div>
             </div>
           </div>
 
@@ -391,10 +412,10 @@
             </div>
             <div>
               ${isCurrent ? `
-                <button class="btn btn-primary btn-sm btn-advance-tech-step" data-step="${idx + 1}" style="font-size:11px; padding:5px 10px;">
+                <button class="btn btn-primary btn-advance-tech-step" data-step="${idx + 1}" style="font-size:12px; font-weight:700; padding:8px 16px; background:linear-gradient(135deg, #ff5a1f 0%, #ea580c 100%); color:#fff; border:none; border-radius:var(--radius-sm); box-shadow:0 4px 14px rgba(255,90,31,0.45); cursor:pointer;">
                   Complete &rarr;
                 </button>
-              ` : (isDone ? `<span style="color:#34d399; font-size:11px; font-weight:700;">Done</span>` : '')}
+              ` : (isDone ? `<span style="color:#34d399; font-size:12px; font-weight:700; padding:4px 8px; background:rgba(34,197,94,0.12); border-radius:var(--radius-sm);">&#x2714; Done</span>` : '')}
             </div>
           </div>
         `;
@@ -748,8 +769,36 @@
     const autoScanBtn = document.getElementById("btn-admin-auto-scan");
     const scanForm = document.getElementById("admin-scan-vin-form");
 
-    if (openScanBtn) openScanBtn.addEventListener("click", () => scanModal.classList.add("active"));
-    if (closeScanBtn) closeScanBtn.addEventListener("click", () => scanModal.classList.remove("active"));
+    function openAdminScanModal() {
+      if (scanModal) {
+        scanModal.style.display = "flex";
+        scanModal.removeAttribute("inert");
+        scanModal.setAttribute("aria-hidden", "false");
+        scanModal.classList.add("active");
+        const input = document.getElementById("admin-vin-input");
+        if (input) setTimeout(() => input.focus(), 50);
+      }
+    }
+
+    function closeAdminScanModal() {
+      if (scanModal) {
+        scanModal.classList.remove("active");
+        scanModal.style.display = "none";
+        scanModal.setAttribute("inert", "");
+        scanModal.setAttribute("aria-hidden", "true");
+      }
+    }
+
+    if (openScanBtn) openScanBtn.addEventListener("click", openAdminScanModal);
+    if (closeScanBtn) closeScanBtn.addEventListener("click", closeAdminScanModal);
+    if (scanModal) {
+      scanModal.addEventListener("click", (e) => {
+        if (e.target === scanModal) closeAdminScanModal();
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeAdminScanModal();
+    });
 
     if (autoScanBtn) {
       autoScanBtn.addEventListener("click", () => {
@@ -763,7 +812,7 @@
         e.preventDefault();
         const vin = document.getElementById("admin-vin-input").value.trim().toUpperCase();
         await api.put(`/tech/bays/${activeBayId}/vin`, { vin });
-        scanModal.classList.remove("active");
+        closeAdminScanModal();
         showToast(`VIN ${vin} logged and verified!`, "success");
         fetchTechData();
       });
@@ -774,7 +823,7 @@
   window.addEventListener("DOMContentLoaded", () => {
     // Live Clock
     if (window.GeoTime) {
-      window.GeoTime.bindLiveClock("admin-live-clock");
+      window.GeoTime.bindLiveClock("admin-live-clock", { context: "staff" });
     }
 
     initEventListeners();

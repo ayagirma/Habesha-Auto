@@ -93,10 +93,31 @@
     container.innerHTML = bays.map(bay => {
       const isVacant = bay.status === "available";
       const hasFinding = bay.finding && bay.finding.customerStatus === "pending";
+      const isRoadTest = !isVacant && bay.currentStep >= 4;
       const pct = isVacant ? 0 : Math.round(((bay.currentStep + 1) / 5) * 100);
 
+      let cardBorderColor = "var(--border-subtle)";
+      let cardBg = "var(--bg-card)";
+      let statusBadge = "";
+
+      if (isVacant) {
+        cardBorderColor = "#22c55e";
+        statusBadge = `<span class="pill pill-good" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.35); font-weight:700;"><span class="status-dot green"></span>Bay Open</span>`;
+      } else if (hasFinding) {
+        cardBorderColor = "#f59e0b";
+        cardBg = "linear-gradient(145deg, rgba(245,158,11,0.06), var(--bg-card))";
+        statusBadge = `<span class="pill pill-warning" style="background:rgba(245,158,11,0.18); color:#fde047; border:1px solid rgba(245,158,11,0.45); font-weight:700;"><span class="status-dot amber"></span>Awaiting Approval</span>`;
+      } else if (isRoadTest) {
+        cardBorderColor = "#38bdf8";
+        cardBg = "linear-gradient(145deg, rgba(56,189,248,0.06), var(--bg-card))";
+        statusBadge = `<span class="pill pill-cyan" style="background:rgba(56,189,248,0.18); color:#38bdf8; border:1px solid rgba(56,189,248,0.45); font-weight:700;"><span class="status-dot cyan" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span>Road Test / QC</span>`;
+      } else {
+        cardBorderColor = "#22c55e";
+        statusBadge = `<span class="pill pill-good" style="background:rgba(34,197,94,0.15); color:#86efac; border:1px solid rgba(34,197,94,0.35); font-weight:700;"><span class="status-dot green"></span>On Schedule &bull; Step ${bay.currentStep + 1}/5</span>`;
+      }
+
       return `
-        <div class="manager-bay-card ${hasFinding ? 'has-alert' : ''}">
+        <div class="manager-bay-card ${hasFinding ? 'has-alert' : ''}" style="border-left: 4px solid ${cardBorderColor}; background: ${cardBg};">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <span class="eyebrow" style="margin-bottom:0;">${bay.bayName.split('(')[0]}</span>
@@ -104,7 +125,7 @@
                 ${bay.vehicle ? bay.vehicle.title : 'Bay Available'}
               </h3>
             </div>
-            ${isVacant ? `<span class="pill pill-good">Open Bay</span>` : `<span class="pill pill-accent">Step ${bay.currentStep + 1}/5</span>`}
+            ${statusBadge}
           </div>
 
           <!-- Progress Bar -->
@@ -114,7 +135,7 @@
               <span class="font-mono">${pct}%</span>
             </div>
             <div class="gauge-bar-track">
-              <div class="gauge-bar-fill good" style="width:${pct}%"></div>
+              <div class="gauge-bar-fill ${hasFinding ? 'warning' : (isRoadTest ? 'cyan' : 'good')}" style="width:${pct}%; ${isRoadTest ? 'background:#38bdf8;' : ''}"></div>
             </div>
           </div>
 
@@ -138,7 +159,7 @@
 
             ${hasFinding ? `
               <div style="background:rgba(255, 90, 31, 0.1); border:1px solid rgba(255, 90, 31, 0.3); border-radius:var(--radius-sm); padding:8px 10px; font-size:11.5px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="color:var(--accent); font-weight:600;">&#x26A0; $${bay.finding.totalCost.toFixed(2)} Finding Pending Approval</span>
+                <span style="color:var(--accent); font-weight:600;">⚠️ $${bay.finding.totalCost.toFixed(2)} Finding Pending Approval</span>
                 <a href="tel:${bay.customer ? bay.customer.phone.replace(/[^0-9]/g, '') : ''}" class="btn btn-primary btn-sm" style="font-size:10.5px; padding:3px 8px;">Call</a>
               </div>
             ` : ''}
@@ -299,14 +320,34 @@
   const refreshBtn = document.getElementById("btn-refresh-manager");
 
   function openAdmitModal() {
-    if (admitModal) admitModal.classList.add("active");
+    if (admitModal) {
+      admitModal.style.display = "flex";
+      admitModal.removeAttribute("inert");
+      admitModal.setAttribute("aria-hidden", "false");
+      admitModal.classList.add("active");
+      const firstInput = admitModal.querySelector("input, select");
+      if (firstInput) setTimeout(() => firstInput.focus(), 50);
+    }
   }
   function closeAdmitModal() {
-    if (admitModal) admitModal.classList.remove("active");
+    if (admitModal) {
+      admitModal.classList.remove("active");
+      admitModal.style.display = "none";
+      admitModal.setAttribute("inert", "");
+      admitModal.setAttribute("aria-hidden", "true");
+    }
   }
 
   if (openAdmitBtn) openAdmitBtn.addEventListener("click", openAdmitModal);
   if (closeAdmitBtn) closeAdmitBtn.addEventListener("click", closeAdmitModal);
+  if (admitModal) {
+    admitModal.addEventListener("click", (e) => {
+      if (e.target === admitModal) closeAdmitModal();
+    });
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAdmitModal();
+  });
   if (refreshBtn) refreshBtn.addEventListener("click", () => {
     fetchAllData();
     showToast("Synced live shop floor telemetry.", "info");
@@ -341,7 +382,7 @@
   // Clock
   const clockEl = document.getElementById("manager-clock");
   if (clockEl && window.GeoTime) {
-    window.GeoTime.bindLiveClock("manager-clock");
+    window.GeoTime.bindLiveClock("manager-clock", { context: "staff" });
   } else if (clockEl) {
     setInterval(() => {
       clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " • Today";
